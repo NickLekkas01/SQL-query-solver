@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/tempproj.dir/main.cpp.o  -o tempproj 

@@ -1,0 +1,3 @@
+/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir
+/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/edit_cache.dir
