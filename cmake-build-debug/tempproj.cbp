@@ -84,6 +84,18 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/athena/CLionProjects/tempproj/DBRelationsReader.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/DBRelationsReader.h">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.h">
+			<Option target="tempproj"/>
+		</Unit>
 		<Unit filename="/home/athena/CLionProjects/tempproj/main.cpp">
 			<Option target="tempproj"/>
 		</Unit>

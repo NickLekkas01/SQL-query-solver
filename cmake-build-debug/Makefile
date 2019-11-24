@@ -123,6 +123,60 @@ tempproj/fast:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/build
 .PHONY : tempproj/fast
 
+DBRelationsReader.o: DBRelationsReader.cpp.o
+
+.PHONY : DBRelationsReader.o
+
+# target to build an object file
+DBRelationsReader.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o
+.PHONY : DBRelationsReader.cpp.o
+
+DBRelationsReader.i: DBRelationsReader.cpp.i
+
+.PHONY : DBRelationsReader.i
+
+# target to preprocess a source file
+DBRelationsReader.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/DBRelationsReader.cpp.i
+.PHONY : DBRelationsReader.cpp.i
+
+DBRelationsReader.s: DBRelationsReader.cpp.s
+
+.PHONY : DBRelationsReader.s
+
+# target to generate assembly for a file
+DBRelationsReader.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/DBRelationsReader.cpp.s
+.PHONY : DBRelationsReader.cpp.s
+
+QueryList.o: QueryList.cpp.o
+
+.PHONY : QueryList.o
+
+# target to build an object file
+QueryList.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryList.cpp.o
+.PHONY : QueryList.cpp.o
+
+QueryList.i: QueryList.cpp.i
+
+.PHONY : QueryList.i
+
+# target to preprocess a source file
+QueryList.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryList.cpp.i
+.PHONY : QueryList.cpp.i
+
+QueryList.s: QueryList.cpp.s
+
+.PHONY : QueryList.s
+
+# target to generate assembly for a file
+QueryList.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryList.cpp.s
+.PHONY : QueryList.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -159,6 +213,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... tempproj"
 	@echo "... edit_cache"
+	@echo "... DBRelationsReader.o"
+	@echo "... DBRelationsReader.i"
+	@echo "... DBRelationsReader.s"
+	@echo "... QueryList.o"
+	@echo "... QueryList.i"
+	@echo "... QueryList.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

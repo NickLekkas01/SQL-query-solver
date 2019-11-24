@@ -6,11 +6,25 @@
 
 #IncludeRegexTransform: 
 
+/home/athena/CLionProjects/tempproj/DBRelationsReader.h
+iostream
+-
+fstream
+-
+
+/home/athena/CLionProjects/tempproj/QueryList.h
+iostream
+-
+
 /home/athena/CLionProjects/tempproj/main.cpp
 iostream
 -
-cstdlib
--
 fstream
+-
+DBRelationsReader.h
+/home/athena/CLionProjects/tempproj/DBRelationsReader.h
+QueryList.h
+/home/athena/CLionProjects/tempproj/QueryList.h
+cstring
 -
 

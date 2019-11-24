@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
+  "CMakeFiles/tempproj.dir/QueryList.cpp.o"
   "CMakeFiles/tempproj.dir/main.cpp.o"
   "tempproj"
   "tempproj.pdb"

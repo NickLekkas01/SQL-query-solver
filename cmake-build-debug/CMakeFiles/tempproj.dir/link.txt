@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/tempproj.dir/main.cpp.o  -o tempproj 
+/usr/bin/c++  -g   CMakeFiles/tempproj.dir/main.cpp.o CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o CMakeFiles/tempproj.dir/QueryList.cpp.o  -o tempproj 

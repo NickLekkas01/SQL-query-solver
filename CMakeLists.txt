@@ -3,4 +3,4 @@ project(tempproj)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(tempproj main.cpp)
+add_executable(tempproj main.cpp DBRelationsReader.cpp DBRelationsReader.h QueryList.cpp QueryList.h)

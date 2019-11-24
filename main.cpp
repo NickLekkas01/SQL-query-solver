@@ -1,108 +1,107 @@
 #include <iostream>
-#include <cstdlib>
 using namespace std;
 #include <fstream>
+#include "DBRelationsReader.h"
+#include "QueryList.h"
+#define QUERYPARTS 3
+#include <cstring>
 
-typedef struct RelationMetadata{
-    uint64_t TuplesNum,
-             RowsNum,
-             *RelationSerialData;
-}RelationMD;
-void printDefinedStruct(RelationMD * relationMd){
-    cout << "testing final product\n";
-    cout << relationMd->RowsNum << " "<< relationMd->TuplesNum<<endl;
-    for(uint64_t i =0 ; i < relationMd->RowsNum *relationMd->TuplesNum;i++){
-        if(i%relationMd->RowsNum == 0){
-            //getchar();
+int getParts( string query, string * QueryParts){
+    string delimiter = "|",
+            token;
+    size_t pos = 0, index = 0;
+    while ((pos = query.find(delimiter)) != std::string::npos) {
+        token = query.substr(0, pos);
+        std::cout << token << std::endl;
+        query.erase(0, pos + delimiter.length());
+        if(index < QUERYPARTS - 1) {
+            QueryParts[index] = token;
+            index ++;
         }
-        cout << relationMd->RelationSerialData[i]<<endl;
+        else{
+            cout << " Too many arguments in query.\n";
+            return 1;
+        }
 
     }
-
-}
-int getInitFileLines(const string& fileName){
-    ifstream file;
-    int lineCount = 0;
-    //get file lines
-    file.open(fileName);
-    if(!file){
-        cout<< "Couldn't open .init file\n";
-        return 1;
-    }
-    string fileLine;
-    //keep pulling lines until you either run out of lines or you get the keyword Done
-    while (file >> fileLine && fileLine != "Done"){
-        lineCount++;
-        //cout << fileLine<< endl;
-    }
-    file.close();
-    return lineCount;
-    // end of file line pulling
-}
-int getRelationData(const string& fileName, RelationMD * currRelMD){
-    ifstream file;
-
-    file.open(fileName,ios::in|ios::binary);
-    if(!file){
-        cout<<"Couldn't open binary relation file\n";
-    }
-    uint64_t temp1;
-    //cout << temp.get();
-    int flag = 0;
-    file.read((char*)&currRelMD->RowsNum, sizeof(temp1));
-    cout << currRelMD->RowsNum<< endl;
-    file.read((char*)&currRelMD->TuplesNum, sizeof(temp1));
-    cout << currRelMD->TuplesNum<< endl;
-    currRelMD->RelationSerialData = new uint64_t[(currRelMD->TuplesNum)*(currRelMD->RowsNum)];
-    //getchar();
-    uint64_t index = 0;
-    while(file.good()){
-        file.read((char*)&temp1, sizeof(temp1));
-        currRelMD->RelationSerialData[index] = temp1;
-        //cout << temp1<< endl;
-        //cout << currRelMD->RelationSerialData[index]<<endl;
-        index++;
-
-    }
-    file.close();
-}
-int getInitFileNames(const string& fileName){
-    ifstream file;
-    string fileLine;
-
-    cout << "About to open .init file\n";
-    int lineCount = getInitFileLines(fileName);
-    // make a rel metadata array with line count spaces
-    RelationMD * AllRelMD = new RelationMD[lineCount];
-    //start of getting the names
-    file.open(fileName);
-    if(!file){
-        cout<< "Couldn't open .init file\n";
-        return 1;
-    }
-    int index = 0;
-
-    while (file >> fileLine && fileLine != "Done"){
-        cout << fileLine<< endl;
-        // send filename to get relation Data
-        getRelationData(fileLine,&AllRelMD[index]);
-        printDefinedStruct(&AllRelMD[index]);
-        index ++;
-    }
-    //end of getting the names
+    QueryParts[QUERYPARTS - 1] = query;
     return 0;
 }
+int getNumOfRelations(const string& relations){
+    int iSpaces = 0;
 
+    //Forgot to mention that strlen is incredibly ineffecient... store ahead of time.
+    int strSize = relations.length();
+    for(unsigned int iLoop = 0; iLoop < strSize; iLoop++ )
+        if(relations [iLoop] == ' ' )
+            iSpaces++;
+
+    return iSpaces + 1;
+}
+RelationMD ** getBindings(string relations, Data * data){
+    int numOfBindings = getNumOfRelations(relations);
+    RelationMD ** temp = new RelationMD * [numOfBindings];
+    size_t pos = 0, index = 0;
+    string delimiter = " ";
+    string token;
+    while ((pos = relations.find(delimiter)) != std::string::npos) {
+        token = relations.substr(0, pos);
+        std::cout << token << std::endl;
+        relations.erase(0, pos + delimiter.length());
+        //printDefinedStruct(&data->relationsData[stoi(token)]);
+        temp[index] = &data->relationsData[stoi(token)];
+        index++;
+    }
+    temp[numOfBindings - 1] = &data->relationsData[stoi(relations)];
+    return temp;
+}
+void batchExecutor(List * batch, Data * data){
+    ListNode * curr = batch->start;
+    string QueryParts[QUERYPARTS];
+    RelationMD ** Bindings;
+    while (curr!= nullptr){
+        getParts(curr->query, QueryParts);
+        Bindings = getBindings(QueryParts[0], data);
+        curr = curr->next;
+    }
+}
+void JobExecutor(const string& queriesFile, Data * data ){
+    ifstream workload(queriesFile);
+    if(!workload){
+        cout << "Couldn't open workload file";
+
+    }
+    List list;
+    string query;
+    while (getline(workload, query)){
+        cout << query<< endl;
+        //if query is F, send batch to process, reset list
+        if(query == "F"){
+            //send batch to process
+            batchExecutor(&list, data);
+            PrintList(&list);
+            DeleteList(&list);
+            list.start= nullptr;
+            list.end = nullptr;
+        }
+        //add query to list
+        AddToList(&list, query);
+
+    }
+    workload.close();
+
+}
 int main(int argc, char *argv[]) {
     std::cout << "Hello, World!" << std::endl;
-    RelationMD rel;
-    //read from the first file all the filenames (string)
-    //read from
-    getInitFileNames(argv[1]);
-    string path = "/home/athena/CLionProjects/tempproj/small/r0";
-    //getRelationData(path,&rel);
-    //temp.read((char*)&temp1, sizeof(temp1));
-    //temp.read((char*)&temp1, sizeof(temp1));
-    //temp >> temp1;
+    //JobExecutor("/home/athena/CLionProjects/tempproj/small/small.work", nullptr);
+    string temp = "3 0 1|0.2=1.0&0.1=2.0&0.2>3499|1.2 0.1", parts[3];
+    RelationMD ** rel;
+    Data * data = getData(argv[1]);
+    getParts(temp, parts);
+    rel = getBindings(parts[0], data);
+    for (int i = 0; i < 3 ; ++i) {
+        printDefinedStruct(rel[i]);
+    }
+    DeleteData(data);
     return 0;
 }
