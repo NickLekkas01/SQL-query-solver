@@ -1,0 +1,16 @@
+//
+// Created by athena on 8/12/19.
+//
+
+#ifndef TEMPPROJ_QUERYEDITOR_H
+#define TEMPPROJ_QUERYEDITOR_H
+#define QUERYPARTS 3
+
+#include "QueryList.h"
+#include "DBRelationsReader.h"
+#include <cstring>
+void JobExecutor(const std::string& queriesFile, Data * data );
+short typeOfPredicate(std::string Predicate);
+void ExecuteNumericalValueQuery(std::string Predicate, RelationMD **Bindings, int numOfBindings);
+
+#endif //TEMPPROJ_QUERYEDITOR_H

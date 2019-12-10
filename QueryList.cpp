@@ -16,6 +16,8 @@ void AddToList(List * list, string value ){
         temp = new ListNode;
         temp->next = nullptr;
         temp ->query = move(value);
+        list->start = temp;
+        list->end = temp;
         list->queriesNum++;
     }else{
         temp = new ListNode;

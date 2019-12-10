@@ -14,9 +14,10 @@ void printDefinedStruct(RelationMD * relationMd){
 }
 void DeleteData(Data * data){
     for (int i = 0; i < data->relationNum; ++i) {
-        delete data->relationsData[i].RelationSerialData;
+        delete [] data->relationsData[i].RelationSerialData;
     }
-    delete data->relationsData;
+    delete [] data->relationsData;
+    delete data;
 }
 int getInitFileLines(const string& fileName){
     ifstream file, file1;

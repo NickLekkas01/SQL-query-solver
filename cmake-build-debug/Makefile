@@ -150,6 +150,33 @@ DBRelationsReader.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/DBRelationsReader.cpp.s
 .PHONY : DBRelationsReader.cpp.s
 
+QueryEditor.o: QueryEditor.cpp.o
+
+.PHONY : QueryEditor.o
+
+# target to build an object file
+QueryEditor.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryEditor.cpp.o
+.PHONY : QueryEditor.cpp.o
+
+QueryEditor.i: QueryEditor.cpp.i
+
+.PHONY : QueryEditor.i
+
+# target to preprocess a source file
+QueryEditor.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryEditor.cpp.i
+.PHONY : QueryEditor.cpp.i
+
+QueryEditor.s: QueryEditor.cpp.s
+
+.PHONY : QueryEditor.s
+
+# target to generate assembly for a file
+QueryEditor.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryEditor.cpp.s
+.PHONY : QueryEditor.cpp.s
+
 QueryList.o: QueryList.cpp.o
 
 .PHONY : QueryList.o
@@ -216,6 +243,9 @@ help:
 	@echo "... DBRelationsReader.o"
 	@echo "... DBRelationsReader.i"
 	@echo "... DBRelationsReader.s"
+	@echo "... QueryEditor.o"
+	@echo "... QueryEditor.i"
+	@echo "... QueryEditor.s"
 	@echo "... QueryList.o"
 	@echo "... QueryList.i"
 	@echo "... QueryList.s"

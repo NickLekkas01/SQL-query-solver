@@ -90,6 +90,12 @@
 		<Unit filename="/home/athena/CLionProjects/tempproj/DBRelationsReader.h">
 			<Option target="tempproj"/>
 		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/QueryEditor.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/QueryEditor.h">
+			<Option target="tempproj"/>
+		</Unit>
 		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.cpp">
 			<Option target="tempproj"/>
 		</Unit>

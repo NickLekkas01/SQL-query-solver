@@ -12,6 +12,18 @@ iostream
 fstream
 -
 
+/home/athena/CLionProjects/tempproj/QueryEditor.cpp
+QueryEditor.h
+/home/athena/CLionProjects/tempproj/QueryEditor.h
+
+/home/athena/CLionProjects/tempproj/QueryEditor.h
+QueryList.h
+/home/athena/CLionProjects/tempproj/QueryList.h
+DBRelationsReader.h
+/home/athena/CLionProjects/tempproj/DBRelationsReader.h
+cstring
+-
+
 /home/athena/CLionProjects/tempproj/QueryList.h
 iostream
 -
@@ -21,10 +33,6 @@ iostream
 -
 fstream
 -
-DBRelationsReader.h
-/home/athena/CLionProjects/tempproj/DBRelationsReader.h
-QueryList.h
-/home/athena/CLionProjects/tempproj/QueryList.h
-cstring
--
+QueryEditor.h
+/home/athena/CLionProjects/tempproj/QueryEditor.h
 
