@@ -28,11 +28,3 @@ cstring
 iostream
 -
 
-/home/athena/CLionProjects/tempproj/main.cpp
-iostream
--
-fstream
--
-QueryEditor.h
-/home/athena/CLionProjects/tempproj/QueryEditor.h
-

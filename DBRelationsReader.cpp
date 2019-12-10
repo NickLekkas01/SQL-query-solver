@@ -4,11 +4,12 @@ using namespace std;
 void printDefinedStruct(RelationMD * relationMd){
     cout << "testing final product\n";
     cout << relationMd->RowsNum << " "<< relationMd->TuplesNum<<endl;
-    for(uint64_t i =0 ; i < relationMd->RowsNum *relationMd->TuplesNum;i++){
+    cout << relationMd->name<<endl;
+    //for(uint64_t i =0 ; i < relationMd->RowsNum *relationMd->TuplesNum;i++){
 
         //cout << relationMd->RelationSerialData[i]<<endl;
 
-    }
+    //}
 
 }
 void DeleteData(Data * data){
@@ -72,6 +73,7 @@ int getRelationData(const string& fileName, RelationMD * currRelMD){
         index++;
 
     }
+    currRelMD->name = fileName.substr( fileName.length() - 2 );
     file.close();
 }
 Data * getData(const string& fileName){

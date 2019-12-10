@@ -7,6 +7,7 @@ typedef struct RelationMetadata{
     uint64_t TuplesNum,
             RowsNum,
             *RelationSerialData;
+    std::string name;
 }RelationMD;
 typedef struct GlobalFilesData{
     int relationNum;
