@@ -1,4 +1,3 @@
-
 #include "DBRelationsReader.h"
 using namespace std;
 
