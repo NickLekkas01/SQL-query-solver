@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /snap/clion/98/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake -E remove -f
+RM = /snap/clion/98/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/athena/CLionProjects/tempproj
+CMAKE_SOURCE_DIR = /home/nicklks/Desktop/JJ2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/athena/CLionProjects/tempproj/cmake-build-debug
+CMAKE_BINARY_DIR = /home/nicklks/Desktop/JJ2/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /home/athena/CLionProjects/tempproj/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/snap/clion/98/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/snap/clion/98/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles /home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles /home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -150,6 +150,33 @@ DBRelationsReader.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/DBRelationsReader.cpp.s
 .PHONY : DBRelationsReader.cpp.s
 
+List.o: List.cpp.o
+
+.PHONY : List.o
+
+# target to build an object file
+List.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/List.cpp.o
+.PHONY : List.cpp.o
+
+List.i: List.cpp.i
+
+.PHONY : List.i
+
+# target to preprocess a source file
+List.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/List.cpp.i
+.PHONY : List.cpp.i
+
+List.s: List.cpp.s
+
+.PHONY : List.s
+
+# target to generate assembly for a file
+List.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/List.cpp.s
+.PHONY : List.cpp.s
+
 QueryEditor.o: QueryEditor.cpp.o
 
 .PHONY : QueryEditor.o
@@ -204,6 +231,33 @@ QueryList.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryList.cpp.s
 .PHONY : QueryList.cpp.s
 
+QuickSort.o: QuickSort.cpp.o
+
+.PHONY : QuickSort.o
+
+# target to build an object file
+QuickSort.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QuickSort.cpp.o
+.PHONY : QuickSort.cpp.o
+
+QuickSort.i: QuickSort.cpp.i
+
+.PHONY : QuickSort.i
+
+# target to preprocess a source file
+QuickSort.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QuickSort.cpp.i
+.PHONY : QuickSort.cpp.i
+
+QuickSort.s: QuickSort.cpp.s
+
+.PHONY : QuickSort.s
+
+# target to generate assembly for a file
+QuickSort.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QuickSort.cpp.s
+.PHONY : QuickSort.cpp.s
+
 UtilQE.o: UtilQE.cpp.o
 
 .PHONY : UtilQE.o
@@ -230,6 +284,33 @@ UtilQE.s: UtilQE.cpp.s
 UtilQE.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/UtilQE.cpp.s
 .PHONY : UtilQE.cpp.s
+
+Utilities.o: Utilities.cpp.o
+
+.PHONY : Utilities.o
+
+# target to build an object file
+Utilities.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Utilities.cpp.o
+.PHONY : Utilities.cpp.o
+
+Utilities.i: Utilities.cpp.i
+
+.PHONY : Utilities.i
+
+# target to preprocess a source file
+Utilities.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Utilities.cpp.i
+.PHONY : Utilities.cpp.i
+
+Utilities.s: Utilities.cpp.s
+
+.PHONY : Utilities.s
+
+# target to generate assembly for a file
+Utilities.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Utilities.cpp.s
+.PHONY : Utilities.cpp.s
 
 main.o: main.cpp.o
 
@@ -270,15 +351,24 @@ help:
 	@echo "... DBRelationsReader.o"
 	@echo "... DBRelationsReader.i"
 	@echo "... DBRelationsReader.s"
+	@echo "... List.o"
+	@echo "... List.i"
+	@echo "... List.s"
 	@echo "... QueryEditor.o"
 	@echo "... QueryEditor.i"
 	@echo "... QueryEditor.s"
 	@echo "... QueryList.o"
 	@echo "... QueryList.i"
 	@echo "... QueryList.s"
+	@echo "... QuickSort.o"
+	@echo "... QuickSort.i"
+	@echo "... QuickSort.s"
 	@echo "... UtilQE.o"
 	@echo "... UtilQE.i"
 	@echo "... UtilQE.s"
+	@echo "... Utilities.o"
+	@echo "... Utilities.i"
+	@echo "... Utilities.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
