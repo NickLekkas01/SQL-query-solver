@@ -84,7 +84,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
 void HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData) {
     //[relid][num of r]
     if (imData->IMResColumnsForFilters[PParts[0]] != nullptr){
-        
+
     }
 }
 

@@ -9,9 +9,16 @@ CMakeFiles/tempproj.dir/QueryEditor.cpp.o
  /home/athena/CLionProjects/tempproj/QueryEditor.cpp
  /home/athena/CLionProjects/tempproj/QueryEditor.h
  /home/athena/CLionProjects/tempproj/QueryList.h
+ /home/athena/CLionProjects/tempproj/UtilQE.h
 CMakeFiles/tempproj.dir/QueryList.cpp.o
  /home/athena/CLionProjects/tempproj/QueryList.cpp
  /home/athena/CLionProjects/tempproj/QueryList.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o
+ /home/athena/CLionProjects/tempproj/DBRelationsReader.h
+ /home/athena/CLionProjects/tempproj/QueryEditor.h
+ /home/athena/CLionProjects/tempproj/QueryList.h
+ /home/athena/CLionProjects/tempproj/UtilQE.cpp
+ /home/athena/CLionProjects/tempproj/UtilQE.h
 CMakeFiles/tempproj.dir/main.cpp.o
  /home/athena/CLionProjects/tempproj/DBRelationsReader.h
  /home/athena/CLionProjects/tempproj/QueryEditor.h

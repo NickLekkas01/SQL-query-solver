@@ -8,9 +8,16 @@ CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../DBRelationsReader.h
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../QueryEditor.cpp
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../QueryEditor.h
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../QueryList.h
+CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../UtilQE.h
 
 CMakeFiles/tempproj.dir/QueryList.cpp.o: ../QueryList.cpp
 CMakeFiles/tempproj.dir/QueryList.cpp.o: ../QueryList.h
+
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../DBRelationsReader.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryEditor.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryList.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../UtilQE.cpp
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../UtilQE.h
 
 CMakeFiles/tempproj.dir/main.cpp.o: ../DBRelationsReader.h
 CMakeFiles/tempproj.dir/main.cpp.o: ../QueryEditor.h
