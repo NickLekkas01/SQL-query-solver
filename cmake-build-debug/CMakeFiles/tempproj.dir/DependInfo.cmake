@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/athena/CLionProjects/tempproj/DBRelationsReader.cpp" "/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
   "/home/athena/CLionProjects/tempproj/QueryEditor.cpp" "/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir/QueryEditor.cpp.o"
   "/home/athena/CLionProjects/tempproj/QueryList.cpp" "/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir/QueryList.cpp.o"
+  "/home/athena/CLionProjects/tempproj/UtilQE.cpp" "/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir/UtilQE.cpp.o"
   "/home/athena/CLionProjects/tempproj/main.cpp" "/home/athena/CLionProjects/tempproj/cmake-build-debug/CMakeFiles/tempproj.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

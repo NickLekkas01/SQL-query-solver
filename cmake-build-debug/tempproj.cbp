@@ -102,6 +102,12 @@
 		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.h">
 			<Option target="tempproj"/>
 		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/UtilQE.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/tempproj/UtilQE.h">
+			<Option target="tempproj"/>
+		</Unit>
 		<Unit filename="/home/athena/CLionProjects/tempproj/main.cpp">
 			<Option target="tempproj"/>
 		</Unit>

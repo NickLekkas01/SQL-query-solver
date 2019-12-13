@@ -12,5 +12,6 @@
 void JobExecutor(const std::string& queriesFile, Data * data );
 short typeOfPredicate(const std::string& Predicate);
 //void ExecuteNumericalValueQuery(std::string Predicate, RelationMD **Bindings, int numOfBindings);
+int * getPredicateParts(std::string Predicate);
 
 #endif //TEMPPROJ_QUERYEDITOR_H

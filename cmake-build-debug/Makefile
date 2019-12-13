@@ -204,6 +204,33 @@ QueryList.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/QueryList.cpp.s
 .PHONY : QueryList.cpp.s
 
+UtilQE.o: UtilQE.cpp.o
+
+.PHONY : UtilQE.o
+
+# target to build an object file
+UtilQE.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/UtilQE.cpp.o
+.PHONY : UtilQE.cpp.o
+
+UtilQE.i: UtilQE.cpp.i
+
+.PHONY : UtilQE.i
+
+# target to preprocess a source file
+UtilQE.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/UtilQE.cpp.i
+.PHONY : UtilQE.cpp.i
+
+UtilQE.s: UtilQE.cpp.s
+
+.PHONY : UtilQE.s
+
+# target to generate assembly for a file
+UtilQE.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/UtilQE.cpp.s
+.PHONY : UtilQE.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -249,6 +276,9 @@ help:
 	@echo "... QueryList.o"
 	@echo "... QueryList.i"
 	@echo "... QueryList.s"
+	@echo "... UtilQE.o"
+	@echo "... UtilQE.i"
+	@echo "... UtilQE.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
