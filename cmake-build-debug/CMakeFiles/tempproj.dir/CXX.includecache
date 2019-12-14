@@ -46,6 +46,12 @@ cstdint
 Types.h
 /home/athena/CLionProjects/tempproj/Types.h
 
+/home/athena/CLionProjects/tempproj/UtilQE.cpp
+QueryEditor.h
+/home/athena/CLionProjects/tempproj/QueryEditor.h
+UtilQE.h
+/home/athena/CLionProjects/tempproj/UtilQE.h
+
 /home/athena/CLionProjects/tempproj/UtilQE.h
 QueryEditor.h
 /home/athena/CLionProjects/tempproj/QueryEditor.h
@@ -57,4 +63,12 @@ Types.h
 /home/athena/CLionProjects/tempproj/Types.h
 List.h
 /home/athena/CLionProjects/tempproj/List.h
+
+/home/athena/CLionProjects/tempproj/main.cpp
+iostream
+-
+fstream
+-
+QueryEditor.h
+/home/athena/CLionProjects/tempproj/QueryEditor.h
 

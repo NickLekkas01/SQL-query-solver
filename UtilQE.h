@@ -39,6 +39,21 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
 
 uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
 void getDataFromFilter(uint64_t * Array, int column, RelationMD *Binding, Relation *relation);
+void getDataFromBindings(RelationMD *Binding, int column, Relation *rel);
 
+void getDataFromJoint(uint64_t *Array, int column, Relation *relation);
 
+void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
+
+int getPleiada(bool *visited, int numOfBindings);
+
+int getFromMap(uint64_t *map, uint64_t bindings, uint64_t RelId);
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
+                  uint64_t LastOfBuffer);
+void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uint64_t *buffer, int index);
+
+void putInBuffer(uint64_t *buffer, uint64_t index, const uint64_t *ImRes, int iterationIndex);
+
+void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex);
 #endif //TEMPPROJ_UTILQE_H
