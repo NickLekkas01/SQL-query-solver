@@ -15,6 +15,7 @@ typedef struct IntermediateData{
     uint64_t *Map;
     uint64_t * IMResColumnsForJoin;
     uint64_t ** IMResColumnsForFilters;
+    uint64_t numOfPleiades;
 }IMData;
 bool isVisited(int i, bool *pBoolean);
 
@@ -39,6 +40,5 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
 uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
 void getDataFromFilter(uint64_t * Array, int column, RelationMD *Binding, Relation *relation);
 
-#include "UtilQE.h"
 
 #endif //TEMPPROJ_UTILQE_H

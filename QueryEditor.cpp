@@ -16,6 +16,11 @@ void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numO
 
 int getPleiada(bool *visited, int numOfBindings);
 
+int getFromMap(uint64_t *map, uint64_t bindings, uint64_t RelId);
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
+                  uint64_t LastOfBuffer);
+
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfBindings = numOfBindings;
@@ -130,7 +135,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                         //and cartestiano ginomeno, save in im results, throw the old out!
                     //case 3
                         //if either exist in im res already, for every line in results, find if in the according column the returned value is there,
-                        //keep the pleiada, save in new im results, delete old im
+                        //keep the numOfColsInTuple, save in new im results, delete old im
                     //case 4
                         // if both exist, for every line in results,
                 delete[] PParts;
@@ -147,16 +152,77 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
 }
 
 void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples) {
-    if(data->IMResColumnsForJoin== nullptr){
+    uint64_t * fresh[2];
+    fresh[0] = RowIDS1;
+    fresh[1]=RowIDS2;
+    if(data->IMResColumnsForJoin == nullptr){
         data->visitedJoint[RowIDS1[0]]=true;
         data->visitedJoint[RowIDS2[0]]=true;
         data->Map[0] = RowIDS1[0];
         data->Map[1] = RowIDS2[0];
+        data->IMResColumnsForJoin = new uint64_t[(numOfTuples-1)*2];
+        uint64_t index = 0;
+        for(uint64_t i = 1; i < numOfTuples; i++) {
+            data->IMResColumnsForJoin[index] = RowIDS1[i];
+            data->IMResColumnsForJoin[index+1] = RowIDS2[i];
+            index += 2;
+        }
+        data->numOfPleiades = (numOfTuples-1);
     }
-    int pleiada = getPleiada(data->visitedJoint, 0);
-    for(uint64_t i = 0 ; i < numOfTuples; i++){
-        //data->IMResColumnsForJoin[]
+    int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
+    if(data->visitedJoint[RowIDS1[0]] ^ data->visitedJoint[RowIDS2[0]]){
+        int commonColumn, commonOfPair;
+        if(!data->visitedJoint[RowIDS1[0]]){
+            data->visitedJoint[RowIDS1[0]] = true;
+            data->Map[numOfColsInTuple] = RowIDS1[0];
+            //commonColumn stoixeio einai ayto poy to rowd[0] tou einai sto map. to map exei se poia 8esh pleiadaw emfanizetai. rara
+            commonColumn = getFromMap(data->Map, data->numOfBindings, RowIDS2[0]);
+            commonOfPair = 1;
+
+        }
+        if(!data->visitedJoint[RowIDS2[0]]){
+            data->visitedJoint[RowIDS2[0]] = true;
+            data->Map[numOfColsInTuple] = RowIDS2[0];
+            commonColumn = getFromMap(data->Map, data->numOfBindings, RowIDS1[0]);
+            commonOfPair = 0;
+        }
+        uint64_t pleades_new=0;
+        int newNumOfColsInTuple = numOfColsInTuple + 1;
+        uint64_t *temp = new uint64_t[newNumOfColsInTuple], *tempold = new uint64_t[numOfColsInTuple];
+        uint64_t *Results = new uint64_t[data->numOfPleiades* (numOfTuples-1) * newNumOfColsInTuple];
+        for(uint64_t i = 1 ; i < numOfTuples; i++){
+            for(uint64_t j = 0; j < data->numOfPleiades; j++){
+                if(fresh[commonOfPair][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + commonColumn]){
+                    //copy oloklhrh numOfColsInTuple in ptemp, put fresh[!commonOfPair][i]sto teleytaio stoixeio thw pleiadas_new
+                    copyToBuffer(temp, data->IMResColumnsForJoin, j, numOfColsInTuple, newNumOfColsInTuple, fresh[1- commonOfPair][i]);
+                    //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
+                    pleades_new++;
+                    //put in new IMresults
+                }
+            }
+        }
     }
+
+}
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
+                  uint64_t LastOfBuffer) {
+    for (uint64_t i = 0; i < numOfCols; ++i) {
+        buffer[i] = Intermediate[(Row*numOfCols)+i];
+    }
+    buffer[newNumOfCols-1] = LastOfBuffer;
+}
+
+//a b
+//c d
+//e f
+int getFromMap(uint64_t *map, uint64_t numOfBindings, uint64_t RelId) {
+    for (uint64_t i = 0; i < numOfBindings; ++i) {
+        if(map[i] == RelId){
+            return i;
+        }
+    }
+    return -1;
 }
 
 int getPleiada(bool *visited, int numOfBindings) {
