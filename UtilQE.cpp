@@ -20,28 +20,7 @@ bool isTrue(uint64_t value1, int op, uint64_t value) {
     }
 }
 using namespace std;
-void initializeIMData(IMData * imData, int numOfBindings){
-    imData->numOfBindings = numOfBindings;
-    imData->visited = new bool[numOfBindings];
-    imData->visitedJoint = new bool[numOfBindings];
-    imData->Map=new uint64_t[numOfBindings];
-    for (int i = 0; i < numOfBindings; ++i) {
-        imData->visited[i] = false;
-    }
-    for (int i = 0; i < numOfBindings; ++i) {
-        imData->Map[i] = -1;
-    }
-    for (int i = 0; i < numOfBindings; ++i) {
-        imData->visitedJoint[i] = false;
-    }
 
-    imData->IMResColumnsForJoin = nullptr ;
-    imData->IMResColumnsForFilters = new uint64_t*[numOfBindings];
-    for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
-
-        imData->IMResColumnsForFilters[i] = nullptr;
-    }
-}
 
 bool isVisited(int i, bool *pBoolean) {
     return pBoolean[i];
