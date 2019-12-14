@@ -2,7 +2,6 @@
 // Created by athena on 8/12/19.
 //
 #include "Utilities.h"
-#include "UtilQE.h"
 #include "QueryEditor.h"
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 
@@ -70,8 +69,8 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                     //send to exception function
                     //add results to
                 }
-                Relation *rel2 = new Relation;
                 Relation *rel1 = new Relation;
+                Relation *rel2 = new Relation;
 
                 if(data.visitedJoint[PParts[0]]){
                     //get data from join array
@@ -104,8 +103,8 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
 
                 Result *result = SortMergeJoin(rel1, rel2);
                 uint64_t numberOfTuples = ListToTable(result->startOfList, R1, R2);
-                R1[0] = PParts[0];
-                R2[0] = PParts[2];
+                R1[0] = (uint64_t )PParts[0];
+                R2[0] = (uint64_t )PParts[2];
                 AddToData(&data, R1, R2, numberOfTuples);
 
                 //else

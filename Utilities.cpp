@@ -5,6 +5,7 @@
 #include "Utilities.h"
 #include "QuickSort.h"
 #include <fstream>
+#include <unistd.h>
 
 using namespace std;
 int resLoc = 0;
@@ -146,7 +147,7 @@ Relation * findRes(int resPos, Relation * pRelation , Relation * nRelation){
 }
 
 int notDone(int index1, int size1, int index2, int size2){
-    return (index1<size1) || (index2<size2);
+    return (index1<size1) && (index2<size2);
 }
 void getMin(Tuple* a, Tuple * b, int * index1, int * index2, int size1, int size2, Tuple * res){
     if(a->key<=b->key && *index1 <size1){
@@ -254,7 +255,7 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
                 if(b.key == currVal)
                     indexS2++;
 
-                if(indexR2 == res1->num_tuples || indexS2 == res2->num_tuples) {
+                if(indexR2 >= res1->num_tuples || indexS2 >= res2->num_tuples) {
                     break;
                 }
                 a.key=res1->tuples[indexR2].key;
@@ -292,6 +293,8 @@ uint64_t ListToTable(List *start, uint64_t *relR, uint64_t *relS)
     }
     relR = new uint64_t[numberOfTuples+1];
     relS = new uint64_t[numberOfTuples+1];
+    relR[0] = 0;
+    relS[0] = 0;
     temp = start;
     while(temp != NULL) {
         for (uint64_t i = 0; i < temp->index; i++) {

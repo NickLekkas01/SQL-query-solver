@@ -8,28 +8,28 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/athena/CLionProjects/tempproj/cmake-build-debug"/>
+				<Option working_dir="/home/nicklks/Desktop/JJ2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/athena/CLionProjects/tempproj/cmake-build-debug"/>
+				<Option working_dir="/home/nicklks/Desktop/JJ2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="tempproj">
-				<Option output="/home/athena/CLionProjects/tempproj/cmake-build-debug/tempproj" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/athena/CLionProjects/tempproj/cmake-build-debug"/>
+				<Option output="/home/nicklks/Desktop/JJ2/cmake-build-debug/tempproj" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/nicklks/Desktop/JJ2/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -44,15 +44,15 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 tempproj"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 tempproj"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="tempproj/fast">
-				<Option output="/home/athena/CLionProjects/tempproj/cmake-build-debug/tempproj" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/athena/CLionProjects/tempproj/cmake-build-debug"/>
+				<Option output="/home/nicklks/Desktop/JJ2/cmake-build-debug/tempproj" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/nicklks/Desktop/JJ2/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -67,69 +67,69 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 tempproj/fast"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 tempproj/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/athena/CLionProjects/tempproj/cmake-build-debug"/>
+				<Option working_dir="/home/nicklks/Desktop/JJ2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/athena/CLionProjects/tempproj/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/nicklks/Desktop/JJ2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/athena/CLionProjects/tempproj/DBRelationsReader.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/DBRelationsReader.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/DBRelationsReader.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/DBRelationsReader.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/List.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/List.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/List.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/List.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QueryEditor.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QueryEditor.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QueryEditor.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QueryEditor.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QueryList.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QueryList.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QueryList.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QuickSort.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QuickSort.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/QuickSort.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/QuickSort.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/UtilQE.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/UtilQE.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/UtilQE.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/UtilQE.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/Utilities.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/Utilities.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/Utilities.h">
+		<Unit filename="/home/nicklks/Desktop/JJ2/Utilities.h">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/main.cpp">
+		<Unit filename="/home/nicklks/Desktop/JJ2/main.cpp">
 			<Option target="tempproj"/>
 		</Unit>
-		<Unit filename="/home/athena/CLionProjects/tempproj/CMakeLists.txt">
+		<Unit filename="/home/nicklks/Desktop/JJ2/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>
