@@ -4,6 +4,10 @@
 CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o
  /home/athena/CLionProjects/tempproj/DBRelationsReader.cpp
  /home/athena/CLionProjects/tempproj/DBRelationsReader.h
+CMakeFiles/tempproj.dir/List.cpp.o
+ /home/athena/CLionProjects/tempproj/List.cpp
+ /home/athena/CLionProjects/tempproj/List.h
+ /home/athena/CLionProjects/tempproj/Types.h
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o
  /home/athena/CLionProjects/tempproj/DBRelationsReader.h
  /home/athena/CLionProjects/tempproj/QueryEditor.cpp
@@ -13,12 +17,22 @@ CMakeFiles/tempproj.dir/QueryEditor.cpp.o
 CMakeFiles/tempproj.dir/QueryList.cpp.o
  /home/athena/CLionProjects/tempproj/QueryList.cpp
  /home/athena/CLionProjects/tempproj/QueryList.h
+CMakeFiles/tempproj.dir/QuickSort.cpp.o
+ /home/athena/CLionProjects/tempproj/QuickSort.cpp
+ /home/athena/CLionProjects/tempproj/QuickSort.h
+ /home/athena/CLionProjects/tempproj/Types.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o
  /home/athena/CLionProjects/tempproj/DBRelationsReader.h
  /home/athena/CLionProjects/tempproj/QueryEditor.h
  /home/athena/CLionProjects/tempproj/QueryList.h
  /home/athena/CLionProjects/tempproj/UtilQE.cpp
  /home/athena/CLionProjects/tempproj/UtilQE.h
+CMakeFiles/tempproj.dir/Utilities.cpp.o
+ /home/athena/CLionProjects/tempproj/List.h
+ /home/athena/CLionProjects/tempproj/QuickSort.h
+ /home/athena/CLionProjects/tempproj/Types.h
+ /home/athena/CLionProjects/tempproj/Utilities.cpp
+ /home/athena/CLionProjects/tempproj/Utilities.h
 CMakeFiles/tempproj.dir/main.cpp.o
  /home/athena/CLionProjects/tempproj/DBRelationsReader.h
  /home/athena/CLionProjects/tempproj/QueryEditor.h

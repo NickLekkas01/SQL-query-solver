@@ -5,7 +5,7 @@
 #include "QueryEditor.h"
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 
-void HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
+uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
 
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
@@ -52,19 +52,21 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                 //break apart predicate, if is same r exception
                 if(PParts[0] == PParts[2]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
-                    //is same relation exception
-                    // if exists in im results, craft
-                    //sending column
-                    //send to exception function
-                    //add results to
                 }
 
                 //else
                 //do the 4 cases: 1 im results of joins are empty.
                     //check if they exist in filters
-                        //craft the to be sent array
-                    //else
-                        //send it from relation (make a copy of the array with RowIds and delete it )
+                    if(data.visited[PParts[0]]){ // if we have a filter
+                        //craft the to be sent array by rowId
+                    }else{
+                        //craft the to bent array by default
+                    }
+                    if(data.visited[PParts[2]]){ // if we have a filter
+                        //craft the to be sent array by rowId
+                    }else{
+                        //craft the to bent array by default from relation
+                    }
                     //case 2
                         //if something exists, but is different from both
                         //get the other pair of values
@@ -81,11 +83,38 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
 
 }
 
-void HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData) {
+uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData) {
     //[relid][num of r]
+    uint64_t * temp = imData->IMResColumnsForFilters[PParts[0]];
+    uint64_t * tempres;
+    uint64_t resNum=0;
     if (imData->IMResColumnsForFilters[PParts[0]] != nullptr){
-
+        tempres = new uint64_t[temp[1]];
+        for (uint64_t i = 2; i < temp[1]+2; ++i) {
+            if(Binding->RelationSerialData[temp[i]*PParts[2]] == Binding->RelationSerialData[temp[i]*PParts[4]]){
+                tempres[i-2]=temp[i];
+                resNum++;
+            }
+        }
+        delete [] imData->IMResColumnsForFilters[PParts[0]];
+    } else{
+        tempres = new uint64_t[Binding->RowsNum];
+        for (uint64_t i = 0; i < Binding->RowsNum; ++i) {
+            if(Binding->RelationSerialData[temp[i]*PParts[2]] == Binding->RelationSerialData[temp[i]*PParts[4]]){
+                tempres[i]=temp[i];
+                resNum++;
+            }
+        }
     }
+    uint64_t * rvalue = new uint64_t[resNum+2];
+    rvalue[0] = PParts[0];
+    rvalue[1] = resNum;
+    for (int j = 2; j < resNum+2; ++j) {
+        rvalue[j] = tempres[j-2];
+    }
+    delete [] tempres;
+    imData->IMResColumnsForFilters[PParts[0]] = rvalue;
+    return rvalue;
 }
 
 void batchExecutor(List * batch, Data * data){

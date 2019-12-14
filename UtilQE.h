@@ -7,8 +7,11 @@
 #include "QueryEditor.h"
 typedef struct IntermediateData{
     uint64_t numOfBindings;
+
     bool * visited;
-    uint64_t ** IMResColumnsForJoin;
+    bool *visitedJoint;
+    uint64_t *Map;
+    uint64_t * IMResColumnsForJoin;
     uint64_t ** IMResColumnsForFilters;
 }IMData;
 bool isVisited(int i, bool *pBoolean);
@@ -33,6 +36,6 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
 
 
 
-#include "UtilQE.h"
+
 
 #endif //TEMPPROJ_UTILQE_H

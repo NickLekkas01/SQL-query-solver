@@ -20,6 +20,28 @@ bool isTrue(uint64_t value1, int op, uint64_t value) {
     }
 }
 using namespace std;
+void initializeIMData(IMData * imData, int numOfBindings){
+    imData->numOfBindings = numOfBindings;
+    imData->visited = new bool[numOfBindings];
+    imData->visitedJoint = new bool[numOfBindings];
+    imData->Map=new uint64_t[numOfBindings];
+    for (int i = 0; i < numOfBindings; ++i) {
+        imData->visited[i] = false;
+    }
+    for (int i = 0; i < numOfBindings; ++i) {
+        imData->Map[i] = -1;
+    }
+    for (int i = 0; i < numOfBindings; ++i) {
+        imData->visitedJoint[i] = false;
+    }
+
+    imData->IMResColumnsForJoin = nullptr ;
+    imData->IMResColumnsForFilters = new uint64_t*[numOfBindings];
+    for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
+
+        imData->IMResColumnsForFilters[i] = nullptr;
+    }
+}
 
 bool isVisited(int i, bool *pBoolean) {
     return pBoolean[i];
@@ -163,6 +185,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
     }
     //allocate return value , 1d array with
     uint64_t * rvalue = new uint64_t[resultsNum +2];
+    rvalue[0] = PredicateParts[0];
     rvalue[1] = resultsNum;
     for (size_t i = 0; i < resultsNum; i++) {
         //std::cout << temp[i] << endl;
@@ -254,22 +277,19 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
         //ιφ this meetws the query,
 
         if(isTrue(Binding->RelationSerialData[ExistingIMResults[i] * ColumnId],Op,value)){
-            temp[i-2] = ExistingIMResults[i];
+            temp[resNums] = ExistingIMResults[i];
             resNums++;
         }
     }
     uint64_t * rvalue = new uint64_t[resNums+2];
+    rvalue[0] = ExistingIMResults[0];
     rvalue[1] = resNums;
     for (size_t i = 0; i < resNums; i++) {
         //std::cout << temp[i] << endl;
-        rvalue[i+1] = temp[i];
+        rvalue[i+2] = temp[i];
         //copy values to returv value array
     }
     delete [] temp;
     return rvalue;
     //return temp;
 }
-
-
-
-//#include "UtilQE.h"
