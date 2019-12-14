@@ -23,6 +23,10 @@ void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int nu
 
 void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uint64_t *buffer, int index);
 
+void putInBuffer(uint64_t *buffer, uint64_t index, const uint64_t *ImRes, int iterationIndex);
+
+void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex);
+
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfBindings = numOfBindings;
@@ -212,8 +216,34 @@ void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numO
         return;
     }
     //last case is if they both are in imres
-    uint64_t *Results = new uint64_t[data->numOfPleiades* getPleiada(data->visited, data->numOfBindings) ];
+    uint64_t *temp = new uint64_t[getPleiada(data->visited, data->numOfBindings)], pleiades_new =0;
+    uint64_t *Results = new uint64_t[data->numOfPleiades* getPleiada(data->visited, data->numOfBindings)];
+    int col1 = getFromMap(data->Map, data->numOfBindings, RowIDS1[0]), col2 = getFromMap(data->Map, data->numOfBindings, RowIDS2[0]);
+    for(uint64_t i = 1 ; i < numOfTuples; i++){
+        for(uint64_t j = 0; j < data->numOfPleiades; j++){
+            if(fresh[0][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col1] && fresh[1][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col2]){
+                putInBuffer(temp, pleiades_new, data->IMResColumnsForJoin, getPleiada(data->visited, data->numOfBindings));
+                putInImResults(temp, Results, pleiades_new, getPleiada(data->visited, data->numOfBindings));
+                pleiades_new++;
+            }
+        }
+    }
+    delete [] temp;
+    data->numOfPleiades = pleiades_new;
+    delete [] data->IMResColumnsForJoin;
+    data->IMResColumnsForJoin = Results;
+}
 
+void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex) {
+    for (int i = 0; i < iterationIndex; ++i) {
+        Results[index+i] = buffer[i];
+    }
+}
+
+void putInBuffer(uint64_t *buffer, uint64_t index, const uint64_t *ImRes, int iterationIndex) {
+    for (int i = 0; i < iterationIndex ; ++i) {
+        buffer[i] = ImRes[index + i];
+    }
 }
 
 void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uint64_t *buffer, int index) {
