@@ -1,36 +1,62 @@
 //
 // Created by athena on 8/12/19.
 //
+#include "Utilities.h"
 #include "UtilQE.h"
 #include "QueryEditor.h"
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 
-uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
+
+
+void getDataFromBindings(RelationMD *Binding, int column, Relation *rel);
+
+void getDataFromJoint(uint64_t *Array, int column, Relation *relation);
+
+void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
+
+int getPleiada(bool *visited, int numOfBindings);
+
+int getFromMap(uint64_t *map, uint64_t bindings, uint64_t RelId);
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
+                  uint64_t LastOfBuffer);
 
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfBindings = numOfBindings;
     imData->visited = new bool[numOfBindings];
+    imData->visitedJoint = new bool[numOfBindings];
+    imData->Map=new uint64_t[numOfBindings];
     for (int i = 0; i < numOfBindings; ++i) {
         imData->visited[i] = false;
     }
+    for (int i = 0; i < numOfBindings; ++i) {
+        imData->Map[i] = -1;
+    }
+    for (int i = 0; i < numOfBindings; ++i) {
+        imData->visitedJoint[i] = false;
+    }
 
-    imData->IMResColumnsForJoin = new uint64_t*[numOfBindings] ;
+    imData->IMResColumnsForJoin = nullptr ;
     imData->IMResColumnsForFilters = new uint64_t*[numOfBindings];
     for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
-        imData->IMResColumnsForJoin[i]= nullptr;
+
         imData->IMResColumnsForFilters[i] = nullptr;
     }
 }
 
 void deleteIntermediateData(IMData * imData){
-    for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
-        delete[] imData->IMResColumnsForJoin[i];
-    }
+
+    delete[] imData->IMResColumnsForJoin;
+    delete [] imData->Map;
+
     for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
         delete[] imData->IMResColumnsForFilters[i];
     }
     delete[] imData->visited;
+
+    delete[] imData->visitedJoint;
+
 }
 
 void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
@@ -38,7 +64,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
     IMData data;
     initializeIMData(&data, numOfBindings);
     int * PParts = nullptr;
-    uint64_t * temp;
+    uint64_t * temp, *R1, *R2;
     for (int i = 0; i < numOfPredicates; ++i) {
         switch(typeOfPredicate(Predicates[i])){
             case 1: //we have a column value compare to number
@@ -52,35 +78,180 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                 //break apart predicate, if is same r exception
                 if(PParts[0] == PParts[2]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
+                    continue;
+                    //is same relation exception
+                    // if exists in im results, craft
+                    //sending column
+                    //send to exception function
+                    //add results to
                 }
+                Relation *rel2 = new Relation;
+                Relation *rel1 = new Relation;
+
+                if(data.visitedJoint[PParts[0]]){
+                    //get data from join array
+                } else if (data.visited[PParts[0]]){
+                    //getdatafromfilter
+                    rel1->num_tuples = data.IMResColumnsForFilters[PParts[0]][1];
+                    rel1->tuples = new Tuple[rel1->num_tuples];
+                    getDataFromFilter(data.IMResColumnsForFilters[PParts[0]], PParts[1], Bindings[PParts[0]], rel1);
+
+                }else{
+                    rel1->num_tuples = Bindings[PParts[0]]->RowsNum;
+                    rel1->tuples = new Tuple[rel1->num_tuples];
+                    getDataFromBindings(Bindings[PParts[0]],PParts[1], rel1);
+                    //get data from bindings
+                }
+                if (data.visitedJoint[PParts[2]]){
+                    getDataFromJoint(data.IMResColumnsForJoin, PParts[3], rel2);
+                    //get data from join array
+                }else if (data.visited[PParts[2]]){
+                    //getdatafromfilter
+                    rel2->num_tuples = data.IMResColumnsForFilters[PParts[2]][1];
+                    rel2->tuples = new Tuple[rel2->num_tuples];
+                    getDataFromFilter(data.IMResColumnsForFilters[PParts[2]], PParts[3], Bindings[PParts[2]], rel2);
+                }else{
+                    //getDatafrom bindings
+                    rel2->num_tuples = Bindings[PParts[2]]->RowsNum;
+                    rel2->tuples = new Tuple[rel2->num_tuples];
+                    getDataFromBindings(Bindings[PParts[2]],PParts[3], rel2);
+                }
+
+                Result *result = SortMergeJoin(rel1, rel2);
+                uint64_t numberOfTuples = ListToTable(result->startOfList, R1, R2);
+                R1[0] = PParts[0];
+                R2[0] = PParts[2];
+                AddToData(&data, R1, R2, numberOfTuples);
 
                 //else
                 //do the 4 cases: 1 im results of joins are empty.
                     //check if they exist in filters
-                    if(data.visited[PParts[0]]){ // if we have a filter
-                        //craft the to be sent array by rowId
-                    }else{
-                        //craft the to bent array by default
-                    }
-                    if(data.visited[PParts[2]]){ // if we have a filter
-                        //craft the to be sent array by rowId
-                    }else{
-                        //craft the to bent array by default from relation
-                    }
+                        //craft the to be sent array
+                    //else
+                        //send it from relation (make a copy of the array with RowIds and delete it )
                     //case 2
                         //if something exists, but is different from both
                         //get the other pair of values
                         //and cartestiano ginomeno, save in im results, throw the old out!
                     //case 3
                         //if either exist in im res already, for every line in results, find if in the according column the returned value is there,
-                        //keep the pleiada, save in new im results, delete old im
+                        //keep the numOfColsInTuple, save in new im results, delete old im
                     //case 4
                         // if both exist, for every line in results,
-                    delete[] PParts;
+                delete[] PParts;
+                delete [] rel1->tuples;
+                delete [] rel2->tuples;
+                delete rel1;
+                delete rel2;
+                delete[] R1;
+                delete[] R2;
                 break;
         }
     }
 
+}
+
+void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples) {
+    uint64_t * fresh[2];
+    fresh[0] = RowIDS1;
+    fresh[1]=RowIDS2;
+    if(data->IMResColumnsForJoin == nullptr){
+        data->visitedJoint[RowIDS1[0]]=true;
+        data->visitedJoint[RowIDS2[0]]=true;
+        data->Map[0] = RowIDS1[0];
+        data->Map[1] = RowIDS2[0];
+        data->IMResColumnsForJoin = new uint64_t[(numOfTuples-1)*2];
+        uint64_t index = 0;
+        for(uint64_t i = 1; i < numOfTuples; i++) {
+            data->IMResColumnsForJoin[index] = RowIDS1[i];
+            data->IMResColumnsForJoin[index+1] = RowIDS2[i];
+            index += 2;
+        }
+        data->numOfPleiades = (numOfTuples-1);
+    }
+    int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
+    if(data->visitedJoint[RowIDS1[0]] ^ data->visitedJoint[RowIDS2[0]]){
+        int commonColumn, commonOfPair;
+        if(!data->visitedJoint[RowIDS1[0]]){
+            data->visitedJoint[RowIDS1[0]] = true;
+            data->Map[numOfColsInTuple] = RowIDS1[0];
+            //commonColumn stoixeio einai ayto poy to rowd[0] tou einai sto map. to map exei se poia 8esh pleiadaw emfanizetai. rara
+            commonColumn = getFromMap(data->Map, data->numOfBindings, RowIDS2[0]);
+            commonOfPair = 1;
+
+        }
+        if(!data->visitedJoint[RowIDS2[0]]){
+            data->visitedJoint[RowIDS2[0]] = true;
+            data->Map[numOfColsInTuple] = RowIDS2[0];
+            commonColumn = getFromMap(data->Map, data->numOfBindings, RowIDS1[0]);
+            commonOfPair = 0;
+        }
+        uint64_t pleades_new=0;
+        int newNumOfColsInTuple = numOfColsInTuple + 1;
+        uint64_t *temp = new uint64_t[newNumOfColsInTuple], *tempold = new uint64_t[numOfColsInTuple];
+        uint64_t *Results = new uint64_t[data->numOfPleiades* (numOfTuples-1) * newNumOfColsInTuple];
+        for(uint64_t i = 1 ; i < numOfTuples; i++){
+            for(uint64_t j = 0; j < data->numOfPleiades; j++){
+                if(fresh[commonOfPair][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + commonColumn]){
+                    //copy oloklhrh numOfColsInTuple in ptemp, put fresh[!commonOfPair][i]sto teleytaio stoixeio thw pleiadas_new
+                    copyToBuffer(temp, data->IMResColumnsForJoin, j, numOfColsInTuple, newNumOfColsInTuple, fresh[1- commonOfPair][i]);
+                    //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
+                    pleades_new++;
+                    //put in new IMresults
+                }
+            }
+        }
+    }
+
+}
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
+                  uint64_t LastOfBuffer) {
+    for (uint64_t i = 0; i < numOfCols; ++i) {
+        buffer[i] = Intermediate[(Row*numOfCols)+i];
+    }
+    buffer[newNumOfCols-1] = LastOfBuffer;
+}
+
+//a b
+//c d
+//e f
+int getFromMap(uint64_t *map, uint64_t numOfBindings, uint64_t RelId) {
+    for (uint64_t i = 0; i < numOfBindings; ++i) {
+        if(map[i] == RelId){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int getPleiada(bool *visited, int numOfBindings) {
+    int res=0;
+    for (int i = 0; i < numOfBindings ; ++i) {
+        if(visited[i])res++;
+    }
+    return res;
+}
+
+void getDataFromJoint(uint64_t *JoinArray, int column, Relation *relation) {
+
+
+}
+
+void getDataFromBindings(RelationMD *Binding, int column, Relation *rel) {
+    uint64_t index = 0;
+    for (uint64_t i = 0; i < Binding->RowsNum; ++i) {
+        rel->tuples[i].payload = i;
+        rel->tuples[i].key = Binding->RelationSerialData[column*Binding->RowsNum + i];
+    }
+}
+
+void getDataFromFilter(uint64_t *Array, int column, RelationMD *Binding, Relation *relation) {
+    for(uint64_t i = 0; i < relation->num_tuples; i++)
+    {
+        relation->tuples[i].payload = Array[i+2];
+        relation->tuples[i].key = Binding->RelationSerialData[column*Binding->RowsNum+Array[i+2]];
+    }
 }
 
 uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData) {
@@ -117,7 +288,7 @@ uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *i
     return rvalue;
 }
 
-void batchExecutor(List * batch, Data * data){
+void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
     string QueryParts[QUERYPARTS];
     RelationMD ** Bindings;
@@ -146,7 +317,7 @@ void JobExecutor(const string &queriesFile, Data *data) {
         cout << "Couldn't open workload file";
 
     }
-    List list;
+    List1 list;
     string query;
     while (getline(workload, query)){
         //cout << query<< endl;

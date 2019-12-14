@@ -10,7 +10,7 @@ using namespace std;
 //if list->start ==NULL then make a new node, set both start & end to new node, copy value
 //else make temp node, set temp.next to NULL, last -> next = temp, last = temp
 
-void AddToList(List * list, string value ){
+void AddToList(List1 * list, string value ){
     ListNode * temp;
     if(list->start == nullptr){
         temp = new ListNode;
@@ -34,7 +34,7 @@ void AddToList(List * list, string value ){
 //temp1= temp
 //delete temp1
 //temp = temp->next
-void DeleteList(List * list){
+void DeleteList(List1 * list){
     ListNode * temp = list->start,
                 *temp1;
     while (temp!= nullptr){
@@ -45,7 +45,7 @@ void DeleteList(List * list){
     }
 }
 
-void PrintList(List * list){
+void PrintList(List1 * list){
     ListNode * temp = list->start;
     while (temp!= nullptr){
         cout << temp->query<< endl;

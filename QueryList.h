@@ -14,11 +14,11 @@ typedef struct listC{
     ListNode * start = nullptr;
     ListNode * end = nullptr;
     int queriesNum = 0;
-}List;
-void AddToList(List * list, std::string value );
-void DeleteList(List * list);
+}List1;
+void AddToList(List1 * list, std::string value );
+void DeleteList(List1 * list);
 
-void PrintList(List * list);
+void PrintList(List1 * list);
 
 
 

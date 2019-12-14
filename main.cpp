@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
     string temp = "3 0 1|0.2=1.0&0.1=2.0&0.2>3499|1.2 0.1", parts[3];
     string x="0.2=1.0&0.1=2.0&0.2>3499";
     getPredicateParts("3.2=1.1");
-    //Data * data = getData(argv[1]);
-    //JobExecutor("/home/athena/CLionProjects/tempproj/small/small.work", data);
+    Data * data = getData(argv[1]);
+    JobExecutor("/home/nicklks/Desktop/JJ2/small/small.work", data);
     //DeleteData(data);
 
     //Binded 0 , 1, 2, 3, 4

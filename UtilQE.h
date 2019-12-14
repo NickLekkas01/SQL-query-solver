@@ -5,6 +5,8 @@
 #ifndef TEMPPROJ_UTILQE_H
 #define TEMPPROJ_UTILQE_H
 #include "QueryEditor.h"
+#include "Types.h"
+
 typedef struct IntermediateData{
     uint64_t numOfBindings;
 
@@ -13,6 +15,7 @@ typedef struct IntermediateData{
     uint64_t *Map;
     uint64_t * IMResColumnsForJoin;
     uint64_t ** IMResColumnsForFilters;
+    uint64_t numOfPleiades;
 }IMData;
 bool isVisited(int i, bool *pBoolean);
 
@@ -34,8 +37,8 @@ uint64_t *ExecuteNumericalValueQuery(std::string Predicate, RelationMD **Binding
 
 uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, RelationMD *Binding, int ColumnId, int Op, uint64_t value);
 
-
-
+uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
+void getDataFromFilter(uint64_t * Array, int column, RelationMD *Binding, Relation *relation);
 
 
 #endif //TEMPPROJ_UTILQE_H

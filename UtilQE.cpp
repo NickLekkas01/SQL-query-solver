@@ -155,7 +155,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
 
             for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum -1; ++i) {
                 if(CorrespondingBinding[i] == PredicateParts[3]){
-                    cout << "query is satisfieδ!\n";
+                    cout << "query is satisfied!\n";
                     temp[resultsNum] = RowId;
                     resultsNum ++;
                 }
@@ -189,7 +189,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
     rvalue[1] = resultsNum;
     for (size_t i = 0; i < resultsNum; i++) {
         //std::cout << temp[i] << endl;
-        rvalue[i+1] = temp[i];
+        rvalue[i+2] = temp[i];
         //copy values to returv value array
     }
     cout << resultsNum <<" resnum \n";
@@ -274,7 +274,7 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
     //bunch of rowids. [num of results in exsting results 1]
     uint64_t * temp = new uint64_t[ExistingIMResults[1]], resNums =0;
     for (int i = 2; i < ExistingIMResults[1]+2 ; ++i) {
-        //ιφ this meetws the query,
+        //if this meets the query,
 
         if(isTrue(Binding->RelationSerialData[ExistingIMResults[i] * ColumnId],Op,value)){
             temp[resNums] = ExistingIMResults[i];
