@@ -140,10 +140,10 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
 //    uint64_t **ProjectionResults = new uint64_t*[numOfProjections];
     uint64_t *sumOfProjections = new uint64_t[numOfProjections];
     uint64_t size = data.numOfPleiades;
-    for (int j = 0; j < numOfProjections; ++j) {
-        if (data.IMResColumnsForFilters[j] != NULL && data.IMResColumnsForFilters[j][1] > size)
-            size = data.IMResColumnsForFilters[j][1];
-    }
+//    for (int j = 0; j < numOfProjections; ++j) {
+//        if (data.visited[j] && data.IMResColumnsForFilters[j][1] > size)
+//            size = data.IMResColumnsForFilters[j][1];
+//    }
     for (int j = 0; j < numOfProjections; ++j) {
         sumOfProjections[j] = 0;
         int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
