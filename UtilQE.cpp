@@ -549,6 +549,7 @@ void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numO
         }
         uint64_t *temp = new uint64_t[numOfColsInTuple];
         uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
+        pleiades_new = 0;
         for(uint64_t i = 1 ; i < numOfTuples; i++){
             for(uint64_t j = 0; j < data->numOfPleiades; j++){
                 if(fresh[0][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col1] && fresh[1][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col2]){
