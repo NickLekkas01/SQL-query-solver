@@ -54,7 +54,7 @@ void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int nu
                   uint64_t LastOfBuffer);
 void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uint64_t *buffer, int index);
 
-void putInBuffer(uint64_t *buffer, uint64_t index, const uint64_t *ImRes, int iterationIndex);
+void putInBuffer(uint64_t *buffer, uint64_t index, uint64_t *ImRes, int iterationIndex);
 
 void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex);
 #endif //TEMPPROJ_UTILQE_H

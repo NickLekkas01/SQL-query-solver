@@ -445,8 +445,13 @@ void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int ite
         Results[index+i] = buffer[i];
     }
 }
-
-void putInBuffer(uint64_t *buffer, uint64_t index, const uint64_t *ImRes, int iterationIndex) {
+void printTuple(uint64_t * buffer, int bufferSize){
+    for (int i = 0; i < bufferSize; ++i) {
+        cout<< buffer[i]<<" ";
+    }
+    cout<<endl;
+}
+void putInBuffer(uint64_t *buffer, uint64_t index, uint64_t *ImRes, int iterationIndex) {
     for (uint64_t i = 0; i < iterationIndex ; ++i) {
         buffer[i] = ImRes[index + i];
     }
@@ -532,13 +537,24 @@ void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numO
     //last case is if they both are in imres
 
     if(data->visitedJoint[RowIDS1[0]] && data->visitedJoint[RowIDS2[0]]){
-        uint64_t *temp = new uint64_t[getPleiada(data->visitedJoint, data->numOfBindings)], pleiades_new =0;
-        uint64_t *Results = new uint64_t[data->numOfPleiades* getPleiada(data->visitedJoint, data->numOfBindings)];
-        int col1 = getFromMap(data->Map, data->numOfBindings, RowIDS1[0]), col2 = getFromMap(data->Map, data->numOfBindings, RowIDS2[0]);
+        uint64_t pleiades_new =0;
+        int col1 = getFromMap(data->Map, data->numOfBindings, fresh[0][0]), col2 = getFromMap(data->Map, data->numOfBindings, fresh[1][0]);
+        int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
+        for(uint64_t i = 1 ; i < numOfTuples; i++) {
+            for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+                if(fresh[0][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col1] && fresh[1][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col2]){
+                    pleiades_new++;
+                }
+            }
+        }
+        uint64_t *temp = new uint64_t[numOfColsInTuple];
+        uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
         for(uint64_t i = 1 ; i < numOfTuples; i++){
             for(uint64_t j = 0; j < data->numOfPleiades; j++){
                 if(fresh[0][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col1] && fresh[1][i] == data->IMResColumnsForJoin[j*numOfColsInTuple + col2]){
-                    putInBuffer(temp, pleiades_new*numOfColsInTuple, data->IMResColumnsForJoin, getPleiada(data->visitedJoint, data->numOfBindings));
+
+                    putInBuffer(temp, j*numOfColsInTuple, data->IMResColumnsForJoin, numOfColsInTuple);
+//                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
                     putInImResults(temp, Results, pleiades_new*numOfColsInTuple, getPleiada(data->visitedJoint, data->numOfBindings));
                     pleiades_new++;
                 }
@@ -564,7 +580,7 @@ void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numO
         uint64_t pleiades_new = 0;
         for(uint64_t i = 1 ; i < numOfTuples; i++){
             for(uint64_t j = 0; j < data->numOfPleiades; j++){
-                putInBuffer(temp, pleiades_new*newNumOfColsInTuple, data->IMResColumnsForJoin, getPleiada(data->visitedJoint, data->numOfBindings));
+                putInBuffer(temp, j*newNumOfColsInTuple, data->IMResColumnsForJoin, getPleiada(data->visitedJoint, data->numOfBindings));
                 putInImResults(temp, Results, pleiades_new*newNumOfColsInTuple, getPleiada(data->visitedJoint, data->numOfBindings));
                 pleiades_new++;
             }

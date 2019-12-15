@@ -9,6 +9,7 @@ void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
+    imData->numOfPleiades = 0;
     imData->numOfBindings = numOfBindings;
     imData->visited = new bool[numOfBindings];
     imData->visitedJoint = new bool[numOfBindings];
@@ -62,6 +63,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 //0->binded R1 1-> r1 column || 2->binded r2 3->binded r3
                 PParts = getPredicateParts(Predicates[i]);
                 //break apart predicate, if is same r exception
+//                if(Bindings[PParts[0]] == Bindings[PParts[2]]){
                 if(PParts[0] == PParts[2]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
                     continue;
