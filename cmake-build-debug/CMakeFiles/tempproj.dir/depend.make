@@ -27,6 +27,7 @@ CMakeFiles/tempproj.dir/QuickSort.cpp.o: ../Types.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../DBRelationsReader.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryEditor.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryList.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QuickSort.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../Types.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../UtilQE.cpp
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../UtilQE.h

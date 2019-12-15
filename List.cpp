@@ -42,8 +42,8 @@ void addItem(List *start, uint64_t rowIDR, uint64_t rowIDS)
     {
         temp = temp->next;
     }
-    temp->rowID[temp->index][0] = rowIDR;
-    temp->rowID[temp->index][1] = rowIDS;
+    temp->rowIDR[temp->index] = rowIDR;
+    temp->rowIDS[temp->index] = rowIDS;
     temp->index++;
 }
 
@@ -77,8 +77,8 @@ void printList(List *start)
         cout << endl;
         for(int i = 0; i < tuplesSize; i++) {
             cout << "INDEX: " << i << endl;
-            cout << "ROWID R: " << temp->rowID[i][0] << endl;
-            cout << "ROWID S: " << temp->rowID[i][1] << endl;
+            cout << "ROWID R: " << temp->rowIDR[i] << endl;
+            cout << "ROWID S: " << temp->rowIDS[i] << endl;
             cout << endl;
         }
         temp = temp->next;
@@ -100,8 +100,8 @@ void printListInFile(List *start)
 //            if(temp->tuples[i].key < max && temp->tuples[i].key != 0)
 //                cout << "Not sorted" << endl;
             ix << "INDEX: " << i << endl;
-            ix << "ROWID R: " << temp->rowID[i][0] << endl;
-            ix << "ROWID S: " << temp->rowID[i][1] << endl;
+            ix << "ROWID R: " << temp->rowIDR[i] << endl;
+            ix << "ROWID S: " << temp->rowIDS[i] << endl;
             ix << endl;
         }
         temp = temp->next;

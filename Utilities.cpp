@@ -280,7 +280,7 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
 
 }
 
-uint64_t ListToTable(List *start, uint64_t *relR, uint64_t *relS)
+uint64_t ListToTable(List *start, uint64_t **relR, uint64_t **relS)
 {
     uint64_t numberOfTuples = 0;
     uint64_t index = 1;
@@ -291,15 +291,13 @@ uint64_t ListToTable(List *start, uint64_t *relR, uint64_t *relS)
 
         temp = temp->next;
     }
-    relR = new uint64_t[numberOfTuples+1];
-    relS = new uint64_t[numberOfTuples+1];
-    relR[0] = 0;
-    relS[0] = 0;
+    (*relR) = new uint64_t[numberOfTuples+1];
+    (*relS) = new uint64_t[numberOfTuples+1];
     temp = start;
     while(temp != NULL) {
         for (uint64_t i = 0; i < temp->index; i++) {
-            relR[index] = temp->rowID[i][0];
-            relS[index++] = temp->rowID[i][1];
+            (*relR)[index] = temp->rowIDR[i];
+            (*relS)[index++] = temp->rowIDS[i];
         }
         temp = temp->next;
     }

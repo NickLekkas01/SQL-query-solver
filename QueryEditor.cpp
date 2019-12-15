@@ -5,6 +5,8 @@
 #include "QueryEditor.h"
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 
+void printResults(uint64_t *sumOfProjections, int numOfProjections);
+
 using namespace std;
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfBindings = numOfBindings;
@@ -43,7 +45,7 @@ void deleteIntermediateData(IMData * imData){
 
 }
 
-void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
+void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
     // initialize IM results here, send them below.
     IMData data;
     initializeIMData(&data, numOfBindings);
@@ -74,6 +76,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
 
                 if(data.visitedJoint[PParts[0]]){
                     //get data from join array
+                    getDataFromJoint(&data, PParts[0], rel1, PParts[1], Bindings[PParts[0]]);
                 } else if (data.visited[PParts[0]]){
                     //getdatafromfilter
                     rel1->num_tuples = data.IMResColumnsForFilters[PParts[0]][1];
@@ -87,7 +90,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                     //get data from bindings
                 }
                 if (data.visitedJoint[PParts[2]]){
-                    getDataFromJoint(data.IMResColumnsForJoin, PParts[3], rel2);
+                    getDataFromJoint(&data, PParts[2], rel2, PParts[3], Bindings[PParts[2]]);
                     //get data from join array
                 }else if (data.visited[PParts[2]]){
                     //getdatafromfilter
@@ -102,7 +105,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                 }
 
                 Result *result = SortMergeJoin(rel1, rel2);
-                uint64_t numberOfTuples = ListToTable(result->startOfList, R1, R2);
+                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
                 R1[0] = (uint64_t )PParts[0];
                 R2[0] = (uint64_t )PParts[2];
                 AddToData(&data, R1, R2, numberOfTuples);
@@ -132,7 +135,62 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, string *Projection
                 break;
         }
     }
+
+    /*Create Results from Projections */
+//    uint64_t **ProjectionResults = new uint64_t*[numOfProjections];
+    uint64_t *sumOfProjections = new uint64_t[numOfProjections];
+    uint64_t size = data.numOfPleiades;
+    for (int j = 0; j < numOfProjections; ++j) {
+        if (data.IMResColumnsForFilters[j] != NULL && data.IMResColumnsForFilters[j][1] > size)
+            size = data.IMResColumnsForFilters[j][1];
+    }
+    for (int j = 0; j < numOfProjections; ++j) {
+        sumOfProjections[j] = 0;
+        int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
+        int columnInTuple = getFromMap(data.Map, data.numOfBindings, Projections[j][0]);
+        uint64_t indexInBinding;
+//        ProjectionResults[j] = new uint64_t[size];
+        if(data.visitedJoint[Projections[j][0]]){
+            int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
+            for(uint64_t k = 0; k < data.numOfPleiades; ++k) {
+                indexInBinding = (data.IMResColumnsForJoin[k*numOfColsInTuple + columnInTuple]);
+                uint64_t numberOfTuples = (Bindings[Projections[j][0]]->RowsNum);
+                int columnForProjection = Projections[j][1];
+//                ProjectionResults[j][k] = Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
+//                sumOfProjections[j] += ProjectionResults[j][k];
+                sumOfProjections[j] += Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
+            }
+        }
+        else if(data.visited[Projections[j][0]]) {
+            int numOfColsInTuple = getPleiada(data.visited, data.numOfBindings);
+            int position;
+            for (int i = 0; i < numOfBindings; i++){
+                if ((data.IMResColumnsForFilters[i][0]) == Projections[j][0]) {
+                    position = i;
+                    break;
+                }
+            }
+//            ProjectionResults[j] = new uint64_t[size];
+            for(uint64_t i = 2; i < (data.IMResColumnsForFilters[position][1])+2; i++){
+                indexInBinding = data.IMResColumnsForFilters[position][i];
+                int numberOfTuples = (Bindings[Projections[j][0]]->RowsNum);
+                int columnForProjection = Projections[j][1];
+//                ProjectionResults[j][i-2] = Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
+//                sumOfProjections[j] += ProjectionResults[j][i-2];
+                sumOfProjections[j] += Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
+            }
+        }
+    }
+    printResults(sumOfProjections, numOfProjections);
     deleteIntermediateData(&data);
+}
+
+void printResults(uint64_t *sumOfProjections, int numOfProjections) {
+    cout << "Results:" << endl;
+    for(int i = 0; i < numOfProjections; i++){
+        cout << "Projection: "<< i <<" Sum: "<<  sumOfProjections[i] << endl;
+    }
+    cout << endl;
 }
 
 void batchExecutor(List1 * batch, Data * data){
@@ -140,9 +198,10 @@ void batchExecutor(List1 * batch, Data * data){
     string QueryParts[QUERYPARTS];
     RelationMD ** Bindings;
     string * Predicates;
-    string * Projections = nullptr;
+    int ** Projections = nullptr;
     int numOfBindings, numOfPredicates, numOfProjections=0;
     while (curr!= nullptr){
+        //numOfProjections=0;
         cout <<"Now Processing Query: "<<curr->query<<endl;
         getParts(curr->query, QueryParts);
         Bindings = getBindings(QueryParts[0], data, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
@@ -150,11 +209,15 @@ void batchExecutor(List1 * batch, Data * data){
         Predicates = getPredicates(QueryParts[1], &numOfPredicates);
         //printStrings(Predicates,getNumOfPredicates(QueryParts[1]));
         //todo get 3rd part - projectionsss
+        Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
         //execute query
         QueryExecutor(Bindings, Predicates, Projections, numOfBindings, numOfPredicates, numOfProjections);
         curr = curr->next;
         delete [] Bindings;
         delete[] Predicates;
+        for(int i = 0; i < numOfProjections; i++)
+            delete Projections[i];
+        delete[] Projections;
     }
 }
 

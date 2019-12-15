@@ -24,7 +24,8 @@ typedef struct relation
 
 typedef struct list
 {
-    uint64_t rowID[tuplesSize][2];
+    uint64_t rowIDR[tuplesSize];
+    uint64_t rowIDS[tuplesSize];
     uint64_t index;
     struct list *next;
 }List;

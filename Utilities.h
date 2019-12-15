@@ -18,6 +18,6 @@ int hashFunction(uint64_t number, int size);
 void printHashTable(List **HashTable, int size);
 void printRelation(Relation *rel);
 Result *SortMergeJoin(Relation *relR, Relation *relS);
-uint64_t ListToTable(List *start, uint64_t *relR, uint64_t *relS);
+uint64_t ListToTable(List *start, uint64_t **relR, uint64_t **relS);
 
 #endif //JJ_UTILITIES_H
