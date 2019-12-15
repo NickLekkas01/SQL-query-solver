@@ -217,9 +217,10 @@ void batchExecutor(List1 * batch, Data * data){
         curr = curr->next;
         delete [] Bindings;
         delete[] Predicates;
-        for(int i = 0; i < numOfProjections; i++)
-            delete Projections[i];
+//        for(int i = 0; i < numOfProjections; i++)
+//            delete[] Projections[i];
         delete[] Projections;
+        Projections = nullptr;
     }
 }
 
