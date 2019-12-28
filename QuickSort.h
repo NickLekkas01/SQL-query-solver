@@ -8,6 +8,7 @@
 #include <cstdint>
 
 #include "Types.h"
+size_t binary_insert(const void *base, size_t nel, size_t width, const void *key, int (*cmp)(const void *, const void *));
 
 void swap(uint64_t * a1, uint64_t * b1, uint64_t * a2, uint64_t * b2);
 void swap(uint64_t * a, uint64_t * b);

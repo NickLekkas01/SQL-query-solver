@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
+  "CMakeFiles/tempproj.dir/Hashtable.cpp.o"
   "CMakeFiles/tempproj.dir/List.cpp.o"
   "CMakeFiles/tempproj.dir/QueryEditor.cpp.o"
   "CMakeFiles/tempproj.dir/QueryList.cpp.o"

@@ -1,4 +1,4 @@
-# Install script for directory: /home/nicklks/Desktop/JJ2
+# Install script for directory: /home/athena/CLionProjects/temp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/nicklks/Desktop/JJ2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/athena/CLionProjects/temp/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -7,7 +7,6 @@
 #include "Types.h"
 #include "List.h"
 
-#define hashTableSize 256
 #define Size 256
 #define CacheSizeTolerance 8000 // this is the CacheSizeTolerance
 #define cacheSize 8000

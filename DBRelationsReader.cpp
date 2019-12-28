@@ -58,9 +58,9 @@ int getRelationData(const string& fileName, RelationMD * currRelMD){
     }
     uint64_t temp1;
     file.read((char*)&currRelMD->RowsNum, sizeof(temp1));
-    cout << currRelMD->RowsNum<< endl;
+    ///cout << currRelMD->RowsNum<< endl;
     file.read((char*)&currRelMD->TuplesNum, sizeof(temp1));
-    cout << currRelMD->TuplesNum<< endl;
+    //cout << currRelMD->TuplesNum<< endl;
 
     uint64_t space = (currRelMD->TuplesNum)*(currRelMD->RowsNum);
     currRelMD->RelationSerialData = new uint64_t[space];
@@ -80,20 +80,20 @@ Data * getData(const string& fileName){
     ifstream file;
     string fileLine;
     Data * temp = new Data;
-    cout << "About to open .init file\n";
+    //cout << "About to open .init file\n";
     int lineCount = getInitFileLines(fileName);
     // make a rel metadata array with line count spaces
     RelationMD * AllRelMD = new RelationMD[lineCount];
     //start of getting the names
     file.open(fileName);
     if(!file){
-        cout<< "Couldn't open .init file\n";
+        //cout<< "Couldn't open .init file\n";
         return nullptr;
     }
     int index = 0;
 
     while (file >> fileLine && fileLine != "Done"){
-        cout << fileLine<< endl;
+        //cout << fileLine<< endl;
         // send filename to get relation Data
         getRelationData(fileLine,&AllRelMD[index]);
         //printDefinedStruct(&AllRelMD[index]);

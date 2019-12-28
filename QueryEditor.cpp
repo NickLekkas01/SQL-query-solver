@@ -4,15 +4,17 @@
 #include "Utilities.h"
 #include "QueryEditor.h"
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
-
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
+void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections);
+
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfPleiades = 0;
     imData->numOfBindings = numOfBindings;
     imData->visited = new bool[numOfBindings];
     imData->visitedJoint = new bool[numOfBindings];
+    //perror("");
     imData->Map=new uint64_t[numOfBindings];
     for (int i = 0; i < numOfBindings; ++i) {
         imData->visited[i] = false;
@@ -40,10 +42,106 @@ void deleteIntermediateData(IMData * imData){
     for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
         delete[] imData->IMResColumnsForFilters[i];
     }
+    delete[] imData->IMResColumnsForFilters;
     delete[] imData->visited;
 
     delete[] imData->visitedJoint;
 
+}
+
+
+void printResults(uint64_t *sumOfProjections, int numOfProjections) {
+    cout << "Results:" << endl;
+    for(int i = 0; i < numOfProjections; i++){
+        cout << "Projection: "<< i <<" Sum: "<<  sumOfProjections[i] << endl;
+    }
+    cout << endl;
+}
+
+
+void getLists(List1 ** batchdebug, int numbatches, const string &queriesFile){
+    ifstream workload(queriesFile);
+    if(!workload){
+        cout << "Couldn't open workload file";
+
+    }
+    int index = 0;
+    List1 * list = new List1;
+    string query;
+    while (getline(workload, query)){
+        //cout << query<< endl;
+        //if query is F, send batch to process, reset list
+        if(query == "F"){
+            //send batch to process
+            batchdebug[index] = list;
+            list= nullptr;
+            list = new List1;
+            index++;
+            continue;
+        }
+        //add query to list
+        AddToList(list, query);
+        //PrintList(&list);
+
+    }
+    workload.close();
+}
+
+void JobExecutor(const string &queriesFile, Data *data) {
+    ifstream workload(queriesFile);
+    if(!workload){
+        cout << "Couldn't open workload file";
+
+    }
+    List1 list;
+    string query;
+    while (getline(workload, query)){
+        //cout << query<< endl;
+        //if query is F, send batch to process, reset list
+        if(query == "F"){
+            //send batch to process
+            batchExecutor(&list, data);
+            //PrintList(&list);
+            DeleteList(&list);
+            list.start= nullptr;
+            list.end = nullptr;
+            continue;
+        }
+        //add query to list
+        AddToList(&list, query);
+        //PrintList(&list);
+
+    }
+    workload.close();
+
+}
+void batchExecutor(List1 * batch, Data * data){
+    ListNode * curr = batch->start;
+    string QueryParts[QUERYPARTS];
+    RelationMD ** Bindings;
+    string * Predicates;
+    int ** Projections = nullptr;
+    int numOfBindings, numOfPredicates, numOfProjections=0;
+    while (curr!= nullptr){
+        //numOfProjections=0;
+        cout <<"Now Processing Query: "<<curr->query<<endl;
+        getParts(curr->query, QueryParts);
+        Bindings = getBindings(QueryParts[0], data, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
+        //get2ndpart
+        Predicates = getPredicates(QueryParts[1], &numOfPredicates, Bindings);
+        //todo get 3rd part - projectionsss
+        Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
+        //execute query
+        QueryExecutor(Bindings, Predicates, Projections, numOfBindings, numOfPredicates, numOfProjections);
+
+        curr = curr->next;
+        delete [] Bindings;
+        delete[] Predicates;
+        for(int i = 0; i < numOfProjections; i++)
+            delete[] Projections[i];
+        delete[] Projections;
+        Projections = nullptr;
+    }
 }
 
 void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
@@ -53,10 +151,18 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     int * PParts = nullptr;
     uint64_t * temp, *R1, *R2;
     for (int i = 0; i < numOfPredicates; ++i) {
+        cout <<"Now processing Predicate "<< Predicates[i]<<endl;
+        ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
+
         switch(typeOfPredicate(Predicates[i])){
             case 1: //we have a column value compare to number
                 //get binded value(pointer to relation) , column value and operator, execute query
                 temp = ExecuteNumericalValueQuery(Predicates[i], Bindings, numOfBindings,&data);
+
+                for (int k = 0; k < temp[1]; ++k) {
+                    fchecker << temp[k] + 1<<endl;
+                }
+
                 //add to im results
                 break;
             case 2:
@@ -64,7 +170,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 PParts = getPredicateParts(Predicates[i]);
                 //break apart predicate, if is same r exception
 //                if(Bindings[PParts[0]] == Bindings[PParts[2]]){
-                if(PParts[0] == PParts[2]){
+                if(Bindings[PParts[0] ] == Bindings[PParts[2]]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
                     continue;
                     //is same relation exception
@@ -89,6 +195,9 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     rel1->num_tuples = Bindings[PParts[0]]->RowsNum;
                     rel1->tuples = new Tuple[rel1->num_tuples];
                     getDataFromBindings(Bindings[PParts[0]],PParts[1], rel1);
+                    for (int j = 0; j < rel1->num_tuples; ++j) {
+                        bindcheck1 << rel1->tuples[j].key<< " " << rel1->tuples[j].payload << endl;
+                    }
                     //get data from bindings
                 }
                 if (data.visitedJoint[PParts[2]]){
@@ -104,32 +213,41 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     rel2->num_tuples = Bindings[PParts[2]]->RowsNum;
                     rel2->tuples = new Tuple[rel2->num_tuples];
                     getDataFromBindings(Bindings[PParts[2]],PParts[3], rel2);
+                    for (int j = 0; j < rel2->num_tuples; ++j) {
+                        bindcheck2 << rel2->tuples[j].key<< " " << rel2->tuples[j].payload << endl;
+                    }
                 }
 
                 Result *result = SortMergeJoin(rel1, rel2);
                 uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
                 R1[0] = (uint64_t )PParts[0];
                 R2[0] = (uint64_t )PParts[2];
-                AddToData(&data, R1, R2, numberOfTuples);
+                ofstream checker("Checker.txt");
 
+                for (int j = 1; j < numberOfTuples; ++j) {
+                    checker << R1[j] + 1 << " " << R2[j] + 1<<endl;
+                }
+                checker.close();
+                AddToData(&data, R1, R2, numberOfTuples);
+                cout << endl;
                 //else
                 //do the 4 cases: 1 im results of joins are empty.
-                    //check if they exist in filters
-                        //craft the to be sent array
-                    //else
-                        //send it from relation (make a copy of the array with RowIds and delete it )
-                    //case 2
-                        //if something exists, but is different from both
-                        //get the other pair of values
-                        //and cartestiano ginomeno, save in im results, throw the old out!
-                    //case 3
-                        //if either exist in im res already, for every line in results, find if in the according column the returned value is there,
-                        //keep the numOfColsInTuple, save in new im results, delete old im
-                    //case 4
-                        // if both exist, for every line in results,
+                //check if they exist in filters
+                //craft the to be sent array
+                //else
+                //send it from relation (make a copy of the array with RowIds and delete it )
+                //case 2
+                //if something exists, but is different from both
+                //get the other pair of values
+                //and cartestiano ginomeno, save in im results, throw the old out!
+                //case 3
+                //if either exist in im res already, for every line in results, find if in the according column the returned value is there,
+                //keep the numOfColsInTuple, save in new im results, delete old im
+                //case 4
+                // if both exist, for every line in results,
                 delete[] PParts;
-                delete [] rel1->tuples;
-                delete [] rel2->tuples;
+                delete[] rel1->tuples;
+                delete[] rel2->tuples;
                 delete rel1;
                 delete rel2;
                 delete[] R1;
@@ -185,70 +303,4 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     }
     printResults(sumOfProjections, numOfProjections);
     deleteIntermediateData(&data);
-}
-
-void printResults(uint64_t *sumOfProjections, int numOfProjections) {
-    cout << "Results:" << endl;
-    for(int i = 0; i < numOfProjections; i++){
-        cout << "Projection: "<< i <<" Sum: "<<  sumOfProjections[i] << endl;
-    }
-    cout << endl;
-}
-
-void batchExecutor(List1 * batch, Data * data){
-    ListNode * curr = batch->start;
-    string QueryParts[QUERYPARTS];
-    RelationMD ** Bindings;
-    string * Predicates;
-    int ** Projections = nullptr;
-    int numOfBindings, numOfPredicates, numOfProjections=0;
-    while (curr!= nullptr){
-        //numOfProjections=0;
-        cout <<"Now Processing Query: "<<curr->query<<endl;
-        getParts(curr->query, QueryParts);
-        Bindings = getBindings(QueryParts[0], data, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
-        //get2ndpart
-        Predicates = getPredicates(QueryParts[1], &numOfPredicates);
-        //printStrings(Predicates,getNumOfPredicates(QueryParts[1]));
-        //todo get 3rd part - projectionsss
-        Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
-        //execute query
-        QueryExecutor(Bindings, Predicates, Projections, numOfBindings, numOfPredicates, numOfProjections);
-        curr = curr->next;
-        delete [] Bindings;
-        delete[] Predicates;
-//        for(int i = 0; i < numOfProjections; i++)
-//            delete[] Projections[i];
-        delete[] Projections;
-        Projections = nullptr;
-    }
-}
-
-void JobExecutor(const string &queriesFile, Data *data) {
-    ifstream workload(queriesFile);
-    if(!workload){
-        cout << "Couldn't open workload file";
-
-    }
-    List1 list;
-    string query;
-    while (getline(workload, query)){
-        //cout << query<< endl;
-        //if query is F, send batch to process, reset list
-        if(query == "F"){
-            //send batch to process
-            batchExecutor(&list, data);
-            PrintList(&list);
-            DeleteList(&list);
-            list.start= nullptr;
-            list.end = nullptr;
-            continue;
-        }
-        //add query to list
-        AddToList(&list, query);
-        //PrintList(&list);
-
-    }
-    workload.close();
-
 }

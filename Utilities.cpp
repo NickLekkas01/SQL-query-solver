@@ -255,9 +255,28 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
                 if(b.key == currVal)
                     indexS2++;
 
-                if(indexR2 >= res1->num_tuples || indexS2 >= res2->num_tuples) {
+                if(indexR2 == res1->num_tuples && indexS2 == res2->num_tuples)
+                    break;
+                if(indexR2 == res1->num_tuples) {
+                    while(res2->tuples[indexS2].key == currVal && indexS2 < res2->num_tuples)
+                        indexS2++;
                     break;
                 }
+                if(indexS2 == res2->num_tuples) {
+                    while (res1->tuples[indexR2].key == currVal && indexR2 < res1->num_tuples )
+                        indexR2++;
+                    break;
+                }
+
+//                if(indexR2 >= res1->num_tuples){
+//                    indexS2++;
+//                    break;
+//                }
+//                if(indexS2 >= res2->num_tuples){
+//                    indexR2++;
+//                    break;
+//                }
+
                 a.key=res1->tuples[indexR2].key;
                 a.payload=res1->tuples[indexR2].payload;
                 b.key=res2->tuples[indexS2].key;

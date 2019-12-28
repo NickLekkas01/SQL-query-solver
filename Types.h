@@ -22,6 +22,11 @@ typedef struct relation
     uint64_t num_tuples;
 }Relation;
 
+typedef struct listnode{
+    uint64_t number;
+    struct listnode *next;
+}listNode;
+
 typedef struct list
 {
     uint64_t rowIDR[tuplesSize];

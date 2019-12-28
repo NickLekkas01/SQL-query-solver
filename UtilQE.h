@@ -30,7 +30,7 @@ int getNumOfRelations(const std::string& relations);
 RelationMD ** getBindings(std::string relations, Data * data, int * bindingsNum);
 int getNumOfPredicates(std::string predicates) ;
 short typeOfPredicate(const std::string& Predicate);
-std::string *getPredicates(std::string predicates, int * predicatesNum);
+std::string *getPredicates(std::string predicates, int *predicatesNum, RelationMD **Bindings);
 int **getProjections(std::string projections, int **Projections, int numOfBindings, int *numOfProjections);
 
 uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int PredicateParts[4]);
@@ -42,7 +42,7 @@ uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *i
 void getDataFromFilter(uint64_t * Array, int column, RelationMD *Binding, Relation *relation);
 void getDataFromBindings(RelationMD *Binding, int column, Relation *rel);
 void insertInNewPos(uint64_t *pInt, uint64_t element, uint64_t pos, uint64_t iterationIndex);
-bool insertInResult(uint64_t *pInt, uint64_t element, uint64_t *iterationIndex);
+bool insertInResult(listNode **HashTable, uint64_t element, uint64_t hashTableSize);
 void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int column, RelationMD *binding);
 void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
 
