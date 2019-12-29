@@ -219,16 +219,23 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 }
 
                 Result *result = SortMergeJoin(rel1, rel2);
-                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
-                R1[0] = (uint64_t )PParts[0];
-                R2[0] = (uint64_t )PParts[2];
-                ofstream checker("Checker.txt");
-
-                for (int j = 1; j < numberOfTuples; ++j) {
-                    checker << R1[j] + 1 << " " << R2[j] + 1<<endl;
+//                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
+//                R1[0] = (uint64_t )PParts[0];
+//                R2[0] = (uint64_t )PParts[2];
+//                ofstream checker("Checker.txt");
+//
+//                for (int j = 1; j < numberOfTuples; ++j) {
+//                    checker << R1[j] + 1 << " " << R2[j] + 1<<endl;
+//                }
+//                checker.close();
+                uint64_t numberOfTuples = 0;
+                List *temp = result->startOfList;
+                while(temp!= NULL) {
+                    numberOfTuples += temp->index;
+                    temp = temp->next;
                 }
-                checker.close();
-                AddToData(&data, R1, R2, numberOfTuples);
+                AddToData(&data, result->startOfList, numberOfTuples, PParts[0], PParts[2]);
+
                 cout << endl;
                 //else
                 //do the 4 cases: 1 im results of joins are empty.
@@ -250,8 +257,8 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 delete[] rel2->tuples;
                 delete rel1;
                 delete rel2;
-                delete[] R1;
-                delete[] R2;
+//                delete[] R1;
+//                delete[] R2;
                 break;
         }
     }

@@ -44,7 +44,8 @@ void getDataFromBindings(RelationMD *Binding, int column, Relation *rel);
 void insertInNewPos(uint64_t *pInt, uint64_t element, uint64_t pos, uint64_t iterationIndex);
 bool insertInResult(listNode **HashTable, uint64_t element, uint64_t hashTableSize);
 void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int column, RelationMD *binding);
-void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
+//void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
+void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t, uint64_t);
 
 int getPleiada(bool *visited, int numOfBindings);
 
