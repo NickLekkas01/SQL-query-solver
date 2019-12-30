@@ -46,6 +46,7 @@ bool insertInResult(listNode **HashTable, uint64_t element, uint64_t hashTableSi
 void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int column, RelationMD *binding);
 //void AddToData(IMData *data, uint64_t *RowIDS1, uint64_t *RowIDS2, uint64_t numOfTuples);
 void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t, uint64_t);
+void BothExistInImJoinException(IMData *data, RelationMD *BindingR, RelationMD *BindingS, int *PParts);
 
 int getPleiada(bool *visited, int numOfBindings);
 

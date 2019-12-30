@@ -172,7 +172,8 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
 //                if(Bindings[PParts[0]] == Bindings[PParts[2]]){
                 if(Bindings[PParts[0] ] == Bindings[PParts[2]]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
-                    continue;
+                    delete[] PParts;
+                    break;
                     //is same relation exception
                     // if exists in im results, craft
                     //sending column
@@ -182,6 +183,11 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 Relation *rel1 = new Relation;
                 Relation *rel2 = new Relation;
 
+                if(data.visitedJoint[PParts[0]] && data.visitedJoint[PParts[2]]){
+                    BothExistInImJoinException(&data, Bindings[PParts[0]], Bindings[PParts[2]], PParts);
+                    delete[] PParts;
+                    break;
+                }
                 if(data.visitedJoint[PParts[0]]){
                     //get data from join array
                     getDataFromJoint(&data, PParts[0], rel1, PParts[1], Bindings[PParts[0]]);

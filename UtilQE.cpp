@@ -659,49 +659,49 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
     }
     //last case is if they both are in imres
 
-    if(data->visitedJoint[bindingR] && data->visitedJoint[bindingS]){
-        uint64_t pleiades_new =0;
-        int col1 = getFromMap(data->Map, data->numOfBindings, bindingR), col2 = getFromMap(data->Map, data->numOfBindings, bindingS);
-        int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
-        List *tempList = start;
-        while(tempList != NULL) {
-            for (uint64_t i = 0; i < tempList->index; i++) {
-                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
-                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
-                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
-                        pleiades_new++;
-                    }
-                }
-            }
-            tempList = tempList->next;
-        }
-        uint64_t *temp = new uint64_t[numOfColsInTuple];
-        uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
-        pleiades_new = 0;
-        tempList = start;
-        while(tempList != NULL) {
-            for (uint64_t i = 0; i < tempList->index; i++) {
-                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
-                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
-                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
-
-                        putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin, numOfColsInTuple);
-//                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
-                        putInImResults(temp, Results, pleiades_new * numOfColsInTuple,
-                                       getPleiada(data->visitedJoint, data->numOfBindings));
-                        pleiades_new++;
-                    }
-                }
-            }
-            tempList = tempList->next;
-        }
-        delete [] temp;
-        data->numOfPleiades = pleiades_new;
-        delete [] data->IMResColumnsForJoin;
-        data->IMResColumnsForJoin = Results;
-        return;
-
-    }
+//    if(data->visitedJoint[bindingR] && data->visitedJoint[bindingS]){
+//        uint64_t pleiades_new =0;
+//        int col1 = getFromMap(data->Map, data->numOfBindings, bindingR), col2 = getFromMap(data->Map, data->numOfBindings, bindingS);
+//        int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
+//        List *tempList = start;
+//        while(tempList != NULL) {
+//            for (uint64_t i = 0; i < tempList->index; i++) {
+//                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+//                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
+//                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
+//                        pleiades_new++;
+//                    }
+//                }
+//            }
+//            tempList = tempList->next;
+//        }
+//        uint64_t *temp = new uint64_t[numOfColsInTuple];
+//        uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
+//        pleiades_new = 0;
+//        tempList = start;
+//        while(tempList != NULL) {
+//            for (uint64_t i = 0; i < tempList->index; i++) {
+//                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+//                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
+//                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
+//
+//                        putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin, numOfColsInTuple);
+////                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
+//                        putInImResults(temp, Results, pleiades_new * numOfColsInTuple,
+//                                       getPleiada(data->visitedJoint, data->numOfBindings));
+//                        pleiades_new++;
+//                    }
+//                }
+//            }
+//            tempList = tempList->next;
+//        }
+//        delete [] temp;
+//        data->numOfPleiades = pleiades_new;
+//        delete [] data->IMResColumnsForJoin;
+//        data->IMResColumnsForJoin = Results;
+//        return;
+//
+//    }
 
     if(!data->visitedJoint[bindingR] && !data->visitedJoint[bindingS]) {
         data->visitedJoint[bindingR] = true;
@@ -735,4 +735,43 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
 
 
     //last case is if they are both not in imres.
+}
+
+void BothExistInImJoinException(IMData *data, RelationMD *BindingR, RelationMD *BindingS, int *PParts)
+{
+    int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
+    int col1 = getFromMap(data->Map, data->numOfBindings, PParts[0]), col2 = getFromMap(data->Map, data->numOfBindings, PParts[2]);
+    uint64_t pleiades_new =0;
+    for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+        uint64_t indexInBinding1, indexInBinding2;
+        indexInBinding1 = data->IMResColumnsForJoin[j * numOfColsInTuple + col1];
+        indexInBinding2 = data->IMResColumnsForJoin[j * numOfColsInTuple + col2];
+
+        if ( BindingR->RelationSerialData[BindingR->RowsNum*PParts[1] + indexInBinding1] ==
+             BindingS->RelationSerialData[BindingS->RowsNum*PParts[3] + indexInBinding2]) {
+            pleiades_new++;
+        }
+    }
+    uint64_t *temp = new uint64_t[numOfColsInTuple];
+    uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
+    pleiades_new = 0;
+    for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+        uint64_t indexInBinding1, indexInBinding2;
+        indexInBinding1 = data->IMResColumnsForJoin[j * numOfColsInTuple + col1];
+        indexInBinding2 = data->IMResColumnsForJoin[j * numOfColsInTuple + col2];
+        if ( BindingR->RelationSerialData[BindingR->RowsNum*PParts[1] + indexInBinding1] ==
+             BindingS->RelationSerialData[BindingS->RowsNum*PParts[3] + indexInBinding2]) {
+
+            putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin, numOfColsInTuple);
+//                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
+            putInImResults(temp, Results, pleiades_new * numOfColsInTuple,
+                           getPleiada(data->visitedJoint, data->numOfBindings));
+            pleiades_new++;
+        }
+    }
+    delete[] temp;
+    data->numOfPleiades = pleiades_new;
+    delete[] data->IMResColumnsForJoin;
+    data->IMResColumnsForJoin = Results;
+    return;
 }
