@@ -38,7 +38,7 @@ uint64_t *ExecuteNumericalValueQuery(std::string Predicate, RelationMD **Binding
 
 uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, RelationMD *Binding, int ColumnId, int Op, uint64_t value);
 
-uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData);
+uint64_t *HandleSameColumnException(int *PParts, RelationMD *Binding1, IMData *imData);
 void getDataFromFilter(uint64_t * Array, int column, RelationMD *Binding, Relation *relation);
 void getDataFromBindings(RelationMD *Binding, int column, Relation *rel);
 void insertInNewPos(uint64_t *pInt, uint64_t element, uint64_t pos, uint64_t iterationIndex);

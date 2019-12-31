@@ -497,26 +497,30 @@ int getPleiada(bool *visited, int numOfBindings) {
     }
     return res;
 }
-uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *imData) {
+uint64_t *HandleSameColumnException(int *PParts, RelationMD *Binding1, IMData *imData) {
     //[relid][num of r]
+    imData->visited[PParts[0]] = true;
     uint64_t * temp = imData->IMResColumnsForFilters[PParts[0]];
-    uint64_t * tempres;
+    RelationMD * wut = Binding1;
+    cout << Binding1->RowsNum<<endl;
+    fflush(stdout);
+    uint64_t * tempres, *tempres1;
     uint64_t resNum=0;
     // 0 is rel1          1 is 1st col           2 is rel2(1)    3 is 2nd col
     if (imData->IMResColumnsForFilters[PParts[0]] != nullptr){
         tempres = new uint64_t[temp[1]];
         for (uint64_t i = 2; i < temp[1]+2; ++i) {
-            if(Binding->RelationSerialData[temp[i]*PParts[2]] == Binding->RelationSerialData[temp[i]*PParts[3]]){
-                tempres[i-2]=temp[i];
+            if(Binding1->RelationSerialData[Binding1->RowsNum * PParts[1] + temp[i]] == Binding1->RelationSerialData[Binding1->RowsNum * PParts[3] + temp[i]]){
+                tempres[resNum]=temp[i];
                 resNum++;
             }
         }
         delete [] imData->IMResColumnsForFilters[PParts[0]];
     } else{
-        tempres = new uint64_t[Binding->RowsNum];
-        for (uint64_t i = 0; i < Binding->RowsNum; ++i) {
-            if(Binding->RelationSerialData[Binding->RowsNum * PParts[1] + i] == Binding->RelationSerialData[Binding->RowsNum * PParts[3] + i]){
-                tempres[i]=i;
+        tempres = new uint64_t[Binding1->RowsNum];
+        for (uint64_t i = 0; i < Binding1->RowsNum; ++i) {
+            if(Binding1->RelationSerialData[Binding1->RowsNum * PParts[1] + i] == Binding1->RelationSerialData[Binding1->RowsNum * PParts[3] + i]){
+                tempres[resNum]=i;
                 resNum++;
             }
         }
@@ -529,7 +533,40 @@ uint64_t * HandleSameColumnException(int *PParts, RelationMD *Binding, IMData *i
     }
     delete [] tempres;
     imData->IMResColumnsForFilters[PParts[0]] = rvalue;
-    return rvalue;
+    //return rvalue;
+    if(PParts[0] == PParts[2])return nullptr;
+    imData->visited[PParts[2]] = true;
+    temp = imData->IMResColumnsForFilters[PParts[2]];
+    resNum=0;
+    if (imData->IMResColumnsForFilters[PParts[2]] != nullptr){
+        tempres = new uint64_t[temp[1]];
+        for (uint64_t i = 2; i < temp[1]+2; ++i) {
+            if(Binding1->RelationSerialData[temp[i] + Binding1->RowsNum * PParts[1]] == Binding1->RelationSerialData[temp[i] + Binding1->RowsNum * PParts[3]]){
+                tempres[resNum]=temp[i];
+                resNum++;
+            }
+        }
+        delete [] imData->IMResColumnsForFilters[PParts[2]];
+    } else{
+        tempres = new uint64_t[Binding1->RowsNum];
+        for (uint64_t i = 0; i < Binding1->RowsNum; ++i) {
+            if(Binding1->RelationSerialData[Binding1->RowsNum * PParts[1] + i] == Binding1->RelationSerialData[Binding1->RowsNum * PParts[3] + i]){
+                tempres[resNum]=i;
+                resNum++;
+            }
+        }
+    }
+    rvalue = new uint64_t[resNum+2];
+    rvalue[0] = PParts[2];
+    rvalue[1] = resNum;
+    for (int j = 2; j < resNum+2; ++j) {
+        rvalue[j] = tempres[j-2];
+    }
+    imData->IMResColumnsForFilters[PParts[2]] = rvalue;
+
+    delete [] tempres;
+
+
 }
 void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex) {
     for (uint64_t i = 0; i < iterationIndex; ++i) {
@@ -775,3 +812,5 @@ void BothExistInImJoinException(IMData *data, RelationMD *BindingR, RelationMD *
     data->IMResColumnsForJoin = Results;
     return;
 }
+
+

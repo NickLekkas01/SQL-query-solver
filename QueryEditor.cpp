@@ -223,19 +223,39 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                         bindcheck2 << rel2->tuples[j].key<< " " << rel2->tuples[j].payload << endl;
                     }
                 }
-
+                ofstream r1txt ("R1.txt");
+                ofstream r2txt ("R2.txt");
+                for (uint64_t  l = 0; l < rel1->num_tuples; ++l) {
+                    r1txt<<rel1->tuples->key;
+                    r1txt<<rel1->tuples->payload;
+                }
+                for (uint64_t  l = 0; l < rel2->num_tuples; ++l) {
+                    r2txt<<rel2->tuples->key;
+                    r2txt<<rel2->tuples->payload;
+                }
+                r1txt.close();
+                r2txt.close();
+                ofstream checker("Checker.txt");
                 Result *result = SortMergeJoin(rel1, rel2);
+                List *temp = result->startOfList;
+                while(temp!= NULL) {
+                    for(uint64_t w =0; w < temp->index; w++){
+                        checker<<temp->rowIDR[w]<<" ";
+                        checker<<temp->rowIDS[w];
+                        checker << endl;
+                    }
+                    temp = temp->next;
+                }
+                checker.close();
 //                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
 //                R1[0] = (uint64_t )PParts[0];
 //                R2[0] = (uint64_t )PParts[2];
-//                ofstream checker("Checker.txt");
 //
 //                for (int j = 1; j < numberOfTuples; ++j) {
 //                    checker << R1[j] + 1 << " " << R2[j] + 1<<endl;
 //                }
-//                checker.close();
                 uint64_t numberOfTuples = 0;
-                List *temp = result->startOfList;
+                temp = result->startOfList;
                 while(temp!= NULL) {
                     numberOfTuples += temp->index;
                     temp = temp->next;
@@ -269,6 +289,35 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
         }
     }
 
+    for(int i = 0; i < data.numOfBindings; i++)
+    {
+        if(!data.visitedJoint[i] && data.visited[i])
+        {
+            int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
+            int newNumOfColsInTuple = numOfColsInTuple + 1;
+            uint64_t *Results = new uint64_t[data.numOfPleiades * (data.IMResColumnsForFilters[i][1]) * newNumOfColsInTuple];
+            uint64_t *temp = new uint64_t[newNumOfColsInTuple];
+            data.visitedJoint[i] = true;
+            data.Map[numOfColsInTuple] = i;
+            uint64_t pleiades_new = 0;
+            for (uint64_t j = 0; j < data.IMResColumnsForFilters[i][1]; j++)
+            {
+                for(uint64_t k = 0; k < data.numOfPleiades; k++)
+                {
+                    putInBuffer(temp, k * newNumOfColsInTuple, data.IMResColumnsForJoin,
+                                getPleiada(data.visitedJoint, data.numOfBindings));
+                    putInImResults(temp, Results, pleiades_new * newNumOfColsInTuple,
+                                   getPleiada(data.visitedJoint, data.numOfBindings));
+                    pleiades_new++;
+                }
+            }
+            delete[] temp;
+            data.numOfPleiades = pleiades_new;
+            delete[] data.IMResColumnsForJoin;
+            data.IMResColumnsForJoin = Results;
+        }
+    }
+
     /*Create Results from Projections */
 //    uint64_t **ProjectionResults = new uint64_t*[numOfProjections];
     uint64_t *sumOfProjections = new uint64_t[numOfProjections];
@@ -298,6 +347,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
             int numOfColsInTuple = getPleiada(data.visited, data.numOfBindings);
             int position;
             for (int i = 0; i < numOfBindings; i++){
+                if (data.IMResColumnsForFilters[i] == NULL) continue;
                 if ((data.IMResColumnsForFilters[i][0]) == Projections[j][0]) {
                     position = i;
                     break;
