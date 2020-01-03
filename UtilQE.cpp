@@ -345,60 +345,6 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
     //return temp;
 }
 
-int hashFunction(uint64_t value, uint64_t size){
-    return value%size;
-}
-
-void printHash(listNode ** hash, int size){
-    listNode * curr;
-    for (int i = 0; i < size; ++i) {
-        curr = hash[i];
-        while (curr!= nullptr){
-            cout << curr->number<<' ';
-            curr = curr->next;
-        }
-        cout << endl;
-    }
-}
-
-void initHash(listNode **hash, uint64_t size){
-    for(uint64_t i = 0; i < size; i++){
-        hash[i] = NULL;
-    }
-}
-
-bool elementExistsInList(listNode *start, uint64_t element){
-    listNode *temp = start;
-    while(temp != NULL){
-        if(temp->number == element)
-            return true;
-        temp = temp->next;
-    }
-    return false;
-}
-
-void insertInList(listNode **start, uint64_t element){
-    if(*start == NULL){
-        (*start) = new listNode;
-        (*start)->number = element;
-        (*start)->next = NULL;
-        return;
-    }
-    listNode *temp = new listNode;
-    temp->number = element;
-    temp->next = (*start);
-    (*start) = temp;
-}
-
-void insertInHash(listNode ** hash, uint64_t size, uint64_t element){
-    int pos = hashFunction(element, size);
-    if(!elementExistsInList(hash[pos], element))
-        insertInList(&hash[pos], element);
-}
-bool insertInResult(listNode **HashTable, uint64_t element, uint64_t hashTableSize) {
-    insertInHash(HashTable, hashTableSize, element);
-
-}
 void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int column, RelationMD *binding) {
     int pleiada_size = getPleiada(data->visitedJoint, data->numOfBindings);
     int pos = getFromMap(data->Map, data->numOfBindings, RelationId);
@@ -477,6 +423,13 @@ void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int nu
         buffer[i] = Intermediate[(Row*numOfCols)+i];
     }
     buffer[newNumOfCols-1] = LastOfBuffer;
+}
+
+void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t numOfCols, uint64_t lastOfBuffer) {
+    for (uint64_t i = 0; i < numOfCols; ++i) {
+        buffer[i] = Intermediate[i];
+    }
+    buffer[numOfCols] = lastOfBuffer;
 }
 
 int getFromMap(uint64_t *map, uint64_t numOfBindings, uint64_t RelId) {
@@ -589,11 +542,16 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
 //    uint64_t * fresh[2];
 //    fresh[0] = start->rowIDR;
 //    fresh[1]= start->rowIDS;
+    uint64_t hashTableSize = (numOfTuples/3)+1;
     if(data->IMResColumnsForJoin == nullptr){
         data->visitedJoint[bindingR]=true;
         data->visitedJoint[bindingS]=true;
         data->Map[0] = bindingR;
         data->Map[1] = bindingS;
+        data->HashTable[0] = new listNode*[hashTableSize];
+        data->HashTable[1] = new listNode*[hashTableSize];
+        initHash(data->HashTable[0], hashTableSize);
+        initHash(data->HashTable[1], hashTableSize);
         data->IMResColumnsForJoin = new uint64_t[numOfTuples*2];
         uint64_t index = 0;
         List *temp = start;
@@ -601,6 +559,8 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
             for (uint64_t i = 0; i < temp->index; i++) {
                 data->IMResColumnsForJoin[index] = temp->rowIDR[i];
                 data->IMResColumnsForJoin[index + 1] = temp->rowIDS[i];
+                insertInHash(data->HashTable[0], hashTableSize, temp->rowIDR[i], &data->IMResColumnsForJoin[index]);
+                insertInHash(data->HashTable[1], hashTableSize, temp->rowIDS[i], &data->IMResColumnsForJoin[index]);
                 index += 2;
             }
             temp = temp->next;
@@ -639,50 +599,112 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
         List *tempList = start;
         while (tempList != NULL) {
             for(uint64_t i = 0 ; i < tempList->index; i++) {
-                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+                //for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+                    uint64_t pos;
                     if (commonOfPair == 0) {
-                        if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
-                            newSize++;
+                        pos = findBucket(tempList->rowIDR[i], (data->numOfPleiades/3)+1);
+                        listNode *tempListNode = data->HashTable[commonColumn][pos];
+                        while(tempListNode != NULL) {
+                            if(tempListNode->number == tempList->rowIDR[i])
+                                newSize++;
+                            tempListNode = tempListNode->next;
+                        }
+//                            if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
+//                                newSize++;
                     } else {
-                        if (tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
-                            newSize++;
+                        pos = findBucket(tempList->rowIDS[i], (data->numOfPleiades/3)+1);
+                        listNode *tempListNode = data->HashTable[commonColumn][pos];
+                        while(tempListNode != NULL) {
+                            if(tempListNode->number == tempList->rowIDS[i])
+                                newSize++;
+                            tempListNode = tempListNode->next;
+                        }
+//                        if (tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
+//                            newSize++;
                     }
-                }
+                //}
             }
             tempList = tempList->next;
         }
+        hashTableSize = (newSize/3)+1;
+        listnode ***tempHashTable = new listnode **[data->numOfBindings];
+
+        for(int i = 0; i < numOfColsInTuple; i++)
+        {
+            if(i!=commonColumn){
+                deleteHashTable(data->HashTable[i], (data->numOfPleiades/3)+1);
+                delete[] data->HashTable[i];
+            }
+        }
+        for(int i = 0; i < newNumOfColsInTuple; i++)
+        {
+//            deleteHashTable(data->HashTable[i], (data->numOfPleiades/3)+1);
+//            delete[] data->HashTable[i];
+            tempHashTable[i] = new listNode *[hashTableSize];
+            initHash(tempHashTable[i], hashTableSize);
+        }
+
         Results = new uint64_t[newSize*newNumOfColsInTuple];
         tempList = start;
         while (tempList != NULL) {
             for (uint64_t i = 0; i < tempList->index; i++) {
-                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+//                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
+                    uint64_t pos;
                     if (commonOfPair == 0) {
-                        if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn]) {
-                            //copy oloklhrh numOfColsInTuple in ptemp, put fresh[!commonOfPair][i]sto teleytaio stoixeio ths pleiadas_new
-                            copyToBuffer(temp, data->IMResColumnsForJoin, j, numOfColsInTuple, newNumOfColsInTuple,
-                                         tempList->rowIDS[i]);
-                            //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
-                            copyToNewIMResults(Results, newNumOfColsInTuple, temp,
-                                               (pleiades_new * newNumOfColsInTuple));
-                            pleiades_new++;
-                            //put in new IMresults
+                        pos = findBucket(tempList->rowIDR[i], (data->numOfPleiades/3)+1);
+                        listNode *tempListNode = data->HashTable[commonColumn][pos];
+                        while(tempListNode != NULL) {
+                            if(tempListNode->number == tempList->rowIDR[i]) {
+                                copyToBuffer(temp, tempListNode->pointer, numOfColsInTuple,
+                                             tempList->rowIDS[i]);
+                                //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
+                                copyToNewIMResults(Results, newNumOfColsInTuple, temp,
+                                                   (pleiades_new * newNumOfColsInTuple));
+                                for(int i = 0; i < newNumOfColsInTuple; i++)
+                                {
+                                    insertInHash(tempHashTable[i], hashTableSize, temp[i], &Results[(pleiades_new * newNumOfColsInTuple)]);
+                                }
+                                pleiades_new++;
+                            }
+                            tempListNode = tempListNode->next;
                         }
+//                        if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn]) {
+//                            //copy oloklhrh numOfColsInTuple in ptemp, put fresh[!commonOfPair][i]sto teleytaio stoixeio ths pleiadas_new
+//                            copyToBuffer(temp, data->IMResColumnsForJoin, j, numOfColsInTuple, newNumOfColsInTuple,
+//                                         tempList->rowIDS[i]);
+//                            //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
+//                            copyToNewIMResults(Results, newNumOfColsInTuple, temp,
+//                                               (pleiades_new * newNumOfColsInTuple));
+//                            pleiades_new++;
+//                            //put in new IMresults
+//                        }
                     } else{
-                        if (tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn]) {
-                            //copy oloklhrh numOfColsInTuple in ptemp, put fresh[!commonOfPair][i]sto teleytaio stoixeio ths pleiadas_new
-                            copyToBuffer(temp, data->IMResColumnsForJoin, j, numOfColsInTuple, newNumOfColsInTuple,
-                                         tempList->rowIDR[i]);
-                            //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
-                            copyToNewIMResults(Results, newNumOfColsInTuple, temp,
-                                               (pleiades_new * newNumOfColsInTuple));
-                            pleiades_new++;
-                            //put in new IMresults
+                        pos = findBucket(tempList->rowIDS[i], (data->numOfPleiades/3)+1);
+                        listNode *tempListNode = data->HashTable[commonColumn][pos];
+                        while(tempListNode != NULL) {
+                            if(tempListNode->number == tempList->rowIDS[i]) {
+                                copyToBuffer(temp, tempListNode->pointer, numOfColsInTuple,
+                                             tempList->rowIDR[i]);
+                                //ftemp = data->IMResColumnsForJoin[j*numOfColsInTuple]
+                                copyToNewIMResults(Results, newNumOfColsInTuple, temp,
+                                                   (pleiades_new * newNumOfColsInTuple));
+                                for(int i = 0; i < newNumOfColsInTuple; i++)
+                                {
+                                    insertInHash(tempHashTable[i], hashTableSize, temp[i], &Results[(pleiades_new * newNumOfColsInTuple)]);
+                                }
+                                pleiades_new++;
+                            }
+                            tempListNode = tempListNode->next;
                         }
                     }
-                }
+//                }
             }
             tempList = tempList->next;
         }
+        deleteHashTable(data->HashTable[commonColumn], (data->numOfPleiades/3)+1);
+        delete[] data->HashTable[commonColumn];
+        delete[] data->HashTable;
+        data->HashTable = tempHashTable;
         delete [] temp;
         data->numOfPleiades = pleiades_new;
         delete [] data->IMResColumnsForJoin;
@@ -746,18 +768,38 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
         uint64_t *Results = new uint64_t[data->numOfPleiades * (numOfTuples) * newNumOfColsInTuple];
         uint64_t pleiades_new = 0;
         List *tempList = start;
+        listnode ***tempHashTable = new listnode **[data->numOfBindings];
+        hashTableSize = ((data->numOfPleiades * (numOfTuples))/3)+1;
+        for(int i = 0; i < numOfColsInTuple; i++)
+        {
+            deleteHashTable(data->HashTable[i], (data->numOfPleiades/3)+1);
+            delete[] data->HashTable[i];
+        }
+        delete[] data->HashTable;
+        for(int i = 0; i < newNumOfColsInTuple; i++)
+        {
+            tempHashTable[i] = new listNode *[hashTableSize];
+            initHash(tempHashTable[i], hashTableSize);
+        }
         while (tempList != NULL) {
             for (uint64_t i = 0; i < tempList->index; i++) {
                 for (uint64_t j = 0; j < data->numOfPleiades; j++) {
-                    putInBuffer(temp, j * newNumOfColsInTuple, data->IMResColumnsForJoin,
-                                getPleiada(data->visitedJoint, data->numOfBindings));
+                    putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin,
+                                numOfColsInTuple);
+                    temp[numOfColsInTuple] = tempList->rowIDR[i];
+                    temp[numOfColsInTuple+1] = tempList->rowIDS[i];
                     putInImResults(temp, Results, pleiades_new * newNumOfColsInTuple,
-                                   getPleiada(data->visitedJoint, data->numOfBindings));
+                                   newNumOfColsInTuple);
+                    for(int i = 0; i < newNumOfColsInTuple; i++)
+                    {
+                        insertInHash(tempHashTable[i], hashTableSize, temp[i], &Results[(pleiades_new * newNumOfColsInTuple)]);
+                    }
                     pleiades_new++;
                 }
             }
             tempList = tempList->next;
         }
+        data->HashTable = tempHashTable;
         delete[] temp;
         data->numOfPleiades = pleiades_new;
         delete[] data->IMResColumnsForJoin;
@@ -786,6 +828,16 @@ void BothExistInImJoinException(IMData *data, RelationMD *BindingR, RelationMD *
     }
     uint64_t *temp = new uint64_t[numOfColsInTuple];
     uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
+    listnode ***tempHashTable = new listnode **[data->numOfBindings];
+    uint64_t hashTableSize = ((pleiades_new)/3)+1;
+    for(int i = 0; i < numOfColsInTuple; i++)
+    {
+        deleteHashTable(data->HashTable[i], (data->numOfPleiades/3)+1);
+        delete[] data->HashTable[i];
+        tempHashTable[i] = new listNode *[hashTableSize];
+        initHash(tempHashTable[i], hashTableSize);
+    }
+    delete[] data->HashTable;
     pleiades_new = 0;
     for (uint64_t j = 0; j < data->numOfPleiades; j++) {
         uint64_t indexInBinding1, indexInBinding2;
@@ -798,9 +850,14 @@ void BothExistInImJoinException(IMData *data, RelationMD *BindingR, RelationMD *
 //                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
             putInImResults(temp, Results, pleiades_new * numOfColsInTuple,
                            getPleiada(data->visitedJoint, data->numOfBindings));
+            for(int i = 0; i < numOfColsInTuple; i++)
+            {
+                insertInHash(tempHashTable[i], hashTableSize, temp[i], &Results[(pleiades_new * numOfColsInTuple)]);
+            }
             pleiades_new++;
         }
     }
+    data->HashTable = tempHashTable;
     delete[] temp;
     data->numOfPleiades = pleiades_new;
     delete[] data->IMResColumnsForJoin;

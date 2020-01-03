@@ -26,6 +26,7 @@ void initializeIMData(IMData * imData, int numOfBindings){
         imData->visitedJoint[i] = false;
     }
 
+    imData->HashTable = new listNode **[numOfBindings];
     imData->IMResColumnsForJoin = nullptr ;
     imData->IMResColumnsForFilters = new uint64_t*[numOfBindings];
     for (uint64_t i = 0; i < imData->numOfBindings; ++i) {
@@ -43,6 +44,7 @@ void deleteIntermediateData(IMData * imData){
         delete[] imData->IMResColumnsForFilters[i];
     }
     delete[] imData->IMResColumnsForFilters;
+    delete[] imData->HashTable;
     delete[] imData->visited;
 
     delete[] imData->visitedJoint;

@@ -5,12 +5,15 @@ CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o: ../DBRelationsReader.cpp
 CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o: ../DBRelationsReader.h
 
 CMakeFiles/tempproj.dir/Hashtable.cpp.o: ../Hashtable.cpp
+CMakeFiles/tempproj.dir/Hashtable.cpp.o: ../Hashtable.h
+CMakeFiles/tempproj.dir/Hashtable.cpp.o: ../Types.h
 
 CMakeFiles/tempproj.dir/List.cpp.o: ../List.cpp
 CMakeFiles/tempproj.dir/List.cpp.o: ../List.h
 CMakeFiles/tempproj.dir/List.cpp.o: ../Types.h
 
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../DBRelationsReader.h
+CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../Hashtable.h
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../List.h
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../QueryEditor.cpp
 CMakeFiles/tempproj.dir/QueryEditor.cpp.o: ../QueryEditor.h
@@ -27,6 +30,7 @@ CMakeFiles/tempproj.dir/QuickSort.cpp.o: ../QuickSort.h
 CMakeFiles/tempproj.dir/QuickSort.cpp.o: ../Types.h
 
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../DBRelationsReader.h
+CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../Hashtable.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryEditor.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QueryList.h
 CMakeFiles/tempproj.dir/UtilQE.cpp.o: ../QuickSort.h
@@ -41,6 +45,7 @@ CMakeFiles/tempproj.dir/Utilities.cpp.o: ../Utilities.cpp
 CMakeFiles/tempproj.dir/Utilities.cpp.o: ../Utilities.h
 
 CMakeFiles/tempproj.dir/main.cpp.o: ../DBRelationsReader.h
+CMakeFiles/tempproj.dir/main.cpp.o: ../Hashtable.h
 CMakeFiles/tempproj.dir/main.cpp.o: ../QueryEditor.h
 CMakeFiles/tempproj.dir/main.cpp.o: ../QueryList.h
 CMakeFiles/tempproj.dir/main.cpp.o: ../Types.h

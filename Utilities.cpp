@@ -288,9 +288,9 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
             indexS1 = indexS2;
         }
     }
-    delete nRelation1->tuples;
+    delete[] nRelation1->tuples;
     delete nRelation1;
-    delete nRelation2->tuples;
+    delete[] nRelation2->tuples;
     delete nRelation2;
     Result *result = new Result;
     result->startOfList = start;

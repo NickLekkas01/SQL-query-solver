@@ -5,6 +5,7 @@
 #ifndef TEMPPROJ_UTILQE_H
 #define TEMPPROJ_UTILQE_H
 #include "QueryEditor.h"
+#include "Hashtable.h"
 #include "Types.h"
 
 typedef struct IntermediateData{
@@ -14,6 +15,7 @@ typedef struct IntermediateData{
     bool *visitedJoint;
     uint64_t *Map;
     uint64_t * IMResColumnsForJoin;
+    listNode ***HashTable;
     uint64_t ** IMResColumnsForFilters;
     uint64_t numOfPleiades;
 }IMData;

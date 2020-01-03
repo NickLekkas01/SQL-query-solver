@@ -24,6 +24,7 @@ typedef struct relation
 
 typedef struct listnode{
     uint64_t number;
+    uint64_t *pointer;
     struct listnode *next;
 }listNode;
 
