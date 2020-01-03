@@ -170,7 +170,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 PParts = getPredicateParts(Predicates[i]);
                 //break apart predicate, if is same r exception
 //                if(Bindings[PParts[0]] == Bindings[PParts[2]]){
-                if(Bindings[PParts[0] ] == Bindings[PParts[2]]){
+                if(PParts[0] == PParts[2]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
                     delete[] PParts;
                     break;
@@ -207,6 +207,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     //get data from bindings
                 }
                 if (data.visitedJoint[PParts[2]]){
+
                     getDataFromJoint(&data, PParts[2], rel2, PParts[3], Bindings[PParts[2]]);
                     //get data from join array
                 }else if (data.visited[PParts[2]]){
@@ -215,6 +216,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     rel2->tuples = new Tuple[rel2->num_tuples];
                     getDataFromFilter(data.IMResColumnsForFilters[PParts[2]], PParts[3], Bindings[PParts[2]], rel2);
                 }else{
+
                     //getDatafrom bindings
                     rel2->num_tuples = Bindings[PParts[2]]->RowsNum;
                     rel2->tuples = new Tuple[rel2->num_tuples];
@@ -289,34 +291,34 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
         }
     }
 
-    for(int i = 0; i < data.numOfBindings; i++)
-    {
-        if(!data.visitedJoint[i] && data.visited[i])
-        {
-            int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
-            int newNumOfColsInTuple = numOfColsInTuple + 1;
-            uint64_t *Results = new uint64_t[data.numOfPleiades * (data.IMResColumnsForFilters[i][1]) * newNumOfColsInTuple];
-            uint64_t *temp = new uint64_t[newNumOfColsInTuple];
-            data.visitedJoint[i] = true;
-            data.Map[numOfColsInTuple] = i;
-            uint64_t pleiades_new = 0;
-            for (uint64_t j = 0; j < data.IMResColumnsForFilters[i][1]; j++)
-            {
-                for(uint64_t k = 0; k < data.numOfPleiades; k++)
-                {
-                    putInBuffer(temp, k * newNumOfColsInTuple, data.IMResColumnsForJoin,
-                                getPleiada(data.visitedJoint, data.numOfBindings));
-                    putInImResults(temp, Results, pleiades_new * newNumOfColsInTuple,
-                                   getPleiada(data.visitedJoint, data.numOfBindings));
-                    pleiades_new++;
-                }
-            }
-            delete[] temp;
-            data.numOfPleiades = pleiades_new;
-            delete[] data.IMResColumnsForJoin;
-            data.IMResColumnsForJoin = Results;
-        }
-    }
+//    for(int i = 0; i < data.numOfBindings; i++)
+//    {
+//        if(!data.visitedJoint[i] && data.visited[i])
+//        {
+//            int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
+//            int newNumOfColsInTuple = numOfColsInTuple + 1;
+//            uint64_t *Results = new uint64_t[data.numOfPleiades * (data.IMResColumnsForFilters[i][1]) * newNumOfColsInTuple];
+//            uint64_t *temp = new uint64_t[newNumOfColsInTuple];
+//            data.visitedJoint[i] = true;
+//            data.Map[numOfColsInTuple] = i;
+//            uint64_t pleiades_new = 0;
+//            for (uint64_t j = 0; j < data.IMResColumnsForFilters[i][1]; j++)
+//            {
+//                for(uint64_t k = 0; k < data.numOfPleiades; k++)
+//                {
+//                    putInBuffer(temp, k * newNumOfColsInTuple, data.IMResColumnsForJoin,
+//                                getPleiada(data.visitedJoint, data.numOfBindings));
+//                    putInImResults(temp, Results, pleiades_new * newNumOfColsInTuple,
+//                                   getPleiada(data.visitedJoint, data.numOfBindings));
+//                    pleiades_new++;
+//                }
+//            }
+//            delete[] temp;
+//            data.numOfPleiades = pleiades_new;
+//            delete[] data.IMResColumnsForJoin;
+//            data.IMResColumnsForJoin = Results;
+//        }
+//    }
 
     /*Create Results from Projections */
 //    uint64_t **ProjectionResults = new uint64_t*[numOfProjections];
@@ -328,7 +330,6 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
 //    }
     for (int j = 0; j < numOfProjections; ++j) {
         sumOfProjections[j] = 0;
-        int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
         int columnInTuple = getFromMap(data.Map, data.numOfBindings, Projections[j][0]);
         uint64_t indexInBinding;
 //        ProjectionResults[j] = new uint64_t[size];

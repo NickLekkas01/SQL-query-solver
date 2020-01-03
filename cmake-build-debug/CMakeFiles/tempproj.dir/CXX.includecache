@@ -18,12 +18,6 @@ cstdint
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
 
-/home/nicklks/Desktop/JJ2/QueryEditor.cpp
-Utilities.h
-/home/nicklks/Desktop/JJ2/Utilities.h
-QueryEditor.h
-/home/nicklks/Desktop/JJ2/QueryEditor.h
-
 /home/nicklks/Desktop/JJ2/QueryEditor.h
 QueryList.h
 /home/nicklks/Desktop/JJ2/QueryList.h
@@ -38,17 +32,43 @@ cstring
 iostream
 -
 
+/home/nicklks/Desktop/JJ2/QuickSort.h
+cstdint
+-
+Types.h
+/home/nicklks/Desktop/JJ2/Types.h
+
 /home/nicklks/Desktop/JJ2/Types.h
 cstdint
 -
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
 
+/home/nicklks/Desktop/JJ2/UtilQE.cpp
+QueryEditor.h
+/home/nicklks/Desktop/JJ2/QueryEditor.h
+UtilQE.h
+/home/nicklks/Desktop/JJ2/UtilQE.h
+QuickSort.h
+/home/nicklks/Desktop/JJ2/QuickSort.h
+
 /home/nicklks/Desktop/JJ2/UtilQE.h
 QueryEditor.h
 /home/nicklks/Desktop/JJ2/QueryEditor.h
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
+
+/home/nicklks/Desktop/JJ2/Utilities.cpp
+iostream
+-
+Utilities.h
+/home/nicklks/Desktop/JJ2/Utilities.h
+QuickSort.h
+/home/nicklks/Desktop/JJ2/QuickSort.h
+fstream
+-
+unistd.h
+-
 
 /home/nicklks/Desktop/JJ2/Utilities.h
 Types.h

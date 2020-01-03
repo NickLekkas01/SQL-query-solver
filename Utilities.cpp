@@ -195,7 +195,7 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
 //    res1 = nRelation1;
 
     //first sorted array is in res 1
-    cout <<"PRINTING FINAL R\n";
+//    cout <<"PRINTING FINAL R\n";
 //    printRelationInFile(res1, "ix1.txt");
 
     //Second Relation
@@ -216,7 +216,7 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
 //    res2 = nRelation2;
 
     //second sorted array is in res 2
-    cout <<"PRINTING FINAL S\n";
+//    cout <<"PRINTING FINAL S\n";
 //    printRelationInFile(res2, "ix2.txt");
     //printRelation(res2);
 

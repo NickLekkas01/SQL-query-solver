@@ -146,7 +146,7 @@ std::string *getPredicates(std::string predicates, int *predicatesNum, RelationM
     }
     for(int i = 0; i < numOfPredicates; i++)
     {
-        if(typeOfPredicate(temp[i]) == 2 && Bindings[temp[i][0] - '0'] == Bindings[temp[i][4] - '0']){
+        if(typeOfPredicate(temp[i]) == 2 && Bindings[temp[i][0] - '0'] != Bindings[temp[i][4] - '0']){
             temp2[index] = temp[i];
             visited[i] = true;
             index++;
@@ -154,7 +154,7 @@ std::string *getPredicates(std::string predicates, int *predicatesNum, RelationM
     }
     for(int i = 0; i < numOfPredicates; i++)
     {
-        if(typeOfPredicate(temp[i]) == 2 && temp[i][0] != temp[i][4] && !visited[i]){
+        if(!visited[i]){
             temp2[index] = temp[i];
             index++;
         }
@@ -501,9 +501,6 @@ uint64_t *HandleSameColumnException(int *PParts, RelationMD *Binding1, IMData *i
     //[relid][num of r]
     imData->visited[PParts[0]] = true;
     uint64_t * temp = imData->IMResColumnsForFilters[PParts[0]];
-    RelationMD * wut = Binding1;
-    cout << Binding1->RowsNum<<endl;
-    fflush(stdout);
     uint64_t * tempres, *tempres1;
     uint64_t resNum=0;
     // 0 is rel1          1 is 1st col           2 is rel2(1)    3 is 2nd col
