@@ -12,12 +12,6 @@ iostream
 fstream
 -
 
-/home/nicklks/Desktop/JJ2/List.h
-cstdint
--
-Types.h
-/home/nicklks/Desktop/JJ2/Types.h
-
 /home/nicklks/Desktop/JJ2/QueryEditor.h
 QueryList.h
 /home/nicklks/Desktop/JJ2/QueryList.h
@@ -57,22 +51,4 @@ QueryEditor.h
 /home/nicklks/Desktop/JJ2/QueryEditor.h
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
-
-/home/nicklks/Desktop/JJ2/Utilities.cpp
-iostream
--
-Utilities.h
-/home/nicklks/Desktop/JJ2/Utilities.h
-QuickSort.h
-/home/nicklks/Desktop/JJ2/QuickSort.h
-fstream
--
-unistd.h
--
-
-/home/nicklks/Desktop/JJ2/Utilities.h
-Types.h
-/home/nicklks/Desktop/JJ2/Types.h
-List.h
-/home/nicklks/Desktop/JJ2/List.h
 

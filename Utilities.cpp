@@ -220,7 +220,6 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
 //    printRelationInFile(res2, "ix2.txt");
     //printRelation(res2);
 
-
     uint64_t indexR1=0, indexR2=0, indexS1=0, indexS2=0;
     uint64_t currVal;
     Tuple a,b;
@@ -258,12 +257,12 @@ Result *SortMergeJoin(Relation *relR, Relation *relS)
                 if(indexR2 == res1->num_tuples && indexS2 == res2->num_tuples)
                     break;
                 if(indexR2 == res1->num_tuples) {
-                    while(res2->tuples[indexS2].key == currVal && indexS2 < res2->num_tuples)
+                    while(indexS2 < res2->num_tuples && res2->tuples[indexS2].key == currVal )
                         indexS2++;
                     break;
                 }
                 if(indexS2 == res2->num_tuples) {
-                    while (res1->tuples[indexR2].key == currVal && indexR2 < res1->num_tuples )
+                    while (indexR2 < res1->num_tuples && res1->tuples[indexR2].key == currVal )
                         indexR2++;
                     break;
                 }

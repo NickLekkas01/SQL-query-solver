@@ -204,7 +204,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
     switch (PredicateParts[2]){
         case '=':
 
-            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum -1; ++i) {
+            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum ; ++i) {
                 if(CorrespondingBinding[i] == PredicateParts[3]){
 //                    cout << "query is satisfied!\n";
                     temp[resultsNum] = RowId;
@@ -214,7 +214,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
             }
             break;
         case '>':
-            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum -1; ++i) {
+            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum ; ++i) {
                 if(CorrespondingBinding[i] > PredicateParts[3]){
 //                    cout << CorrespondingBinding[i]<<" query is satisfied!\n";
                     temp[resultsNum] = RowId;
@@ -224,7 +224,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
             }
             break;
         case '<':
-            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum -1; ++i) {
+            for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum ; ++i) {
                 if(CorrespondingBinding[i] < PredicateParts[3]){
 //                    cout << "query is satisfied!\n";
                     temp[resultsNum] = RowId;
@@ -243,7 +243,7 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
         rvalue[i+2] = temp[i];
         //copy values to returv value array
     }
-    cout << resultsNum <<" resnum \n";
+//    cout << resultsNum <<" resnum \n";
 
     delete [] temp;
     //return value array
@@ -327,7 +327,7 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
     for (int i = 2; i < ExistingIMResults[1]+2 ; ++i) {
         //if this meets the query,
 
-        if(isTrue(Binding->RelationSerialData[ExistingIMResults[i] * ColumnId],Op,value)){
+        if(isTrue(Binding->RelationSerialData[ExistingIMResults[i]+Binding->RowsNum*ColumnId],Op,value)){
             temp[resNums] = ExistingIMResults[i];
             resNums++;
         }
@@ -465,12 +465,10 @@ void getDataFromBindings(RelationMD *Binding, int column, Relation *rel) {
 }
 
 void getDataFromFilter(uint64_t *Array, int column, RelationMD *Binding, Relation *relation) {
-    int eh;
     for(uint64_t i = 0; i < relation->num_tuples; i++)
     {
         relation->tuples[i].payload = Array[i+2];
         relation->tuples[i].key = Binding->RelationSerialData[column*Binding->RowsNum+Array[i+2]];
-        eh++;
     }
 }
 void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
