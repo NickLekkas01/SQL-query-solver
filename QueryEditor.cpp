@@ -37,6 +37,13 @@ void initializeIMData(IMData * imData, int numOfBindings){
 
 void deleteIntermediateData(IMData * imData){
 
+    for(int i = 0; i < getPleiada(imData->visitedJoint, imData->numOfBindings); i++)
+    {
+        deleteHashTable(imData->HashTable[i], (imData->numOfPleiades/3)+1);
+        delete[] imData->HashTable[i];
+    }
+    delete[] imData->HashTable;
+
     delete[] imData->IMResColumnsForJoin;
     delete [] imData->Map;
 
@@ -44,7 +51,7 @@ void deleteIntermediateData(IMData * imData){
         delete[] imData->IMResColumnsForFilters[i];
     }
     delete[] imData->IMResColumnsForFilters;
-    delete[] imData->HashTable;
+
     delete[] imData->visited;
 
     delete[] imData->visitedJoint;
@@ -182,14 +189,16 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     //send to exception function
                     //add results to
                 }
-                Relation *rel1 = new Relation;
-                Relation *rel2 = new Relation;
-
                 if(data.visitedJoint[PParts[0]] && data.visitedJoint[PParts[2]]){
                     BothExistInImJoinException(&data, Bindings[PParts[0]], Bindings[PParts[2]], PParts);
                     delete[] PParts;
                     break;
                 }
+
+                Relation *rel1 = new Relation;
+                Relation *rel2 = new Relation;
+
+
                 if(data.visitedJoint[PParts[0]]){
                     //get data from join array
                     getDataFromJoint(&data, PParts[0], rel1, PParts[1], Bindings[PParts[0]]);
@@ -282,6 +291,8 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 //keep the numOfColsInTuple, save in new im results, delete old im
                 //case 4
                 // if both exist, for every line in results,
+                deleteList(&result->startOfList);
+                delete result;
                 delete[] PParts;
                 delete[] rel1->tuples;
                 delete[] rel2->tuples;
@@ -292,6 +303,7 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                 break;
         }
     }
+
 
 //    for(int i = 0; i < data.numOfBindings; i++)
 //    {
@@ -368,5 +380,6 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
         }
     }
     printResults(sumOfProjections, numOfProjections);
+    delete[] sumOfProjections;
     deleteIntermediateData(&data);
 }

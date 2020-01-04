@@ -6,9 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/nicklks/Desktop/JJ2/Hashtable.cpp
-Hashtable.h
-/home/nicklks/Desktop/JJ2/Hashtable.h
+/home/nicklks/Desktop/JJ2/DBRelationsReader.h
+iostream
+-
+fstream
+-
 
 /home/nicklks/Desktop/JJ2/Hashtable.h
 iostream
@@ -18,9 +20,45 @@ cstdint
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
 
+/home/nicklks/Desktop/JJ2/QueryEditor.h
+QueryList.h
+/home/nicklks/Desktop/JJ2/QueryList.h
+DBRelationsReader.h
+/home/nicklks/Desktop/JJ2/DBRelationsReader.h
+UtilQE.h
+/home/nicklks/Desktop/JJ2/UtilQE.h
+cstring
+-
+
+/home/nicklks/Desktop/JJ2/QueryList.h
+iostream
+-
+
+/home/nicklks/Desktop/JJ2/QuickSort.h
+cstdint
+-
+Types.h
+/home/nicklks/Desktop/JJ2/Types.h
+
 /home/nicklks/Desktop/JJ2/Types.h
 cstdint
 -
+Types.h
+/home/nicklks/Desktop/JJ2/Types.h
+
+/home/nicklks/Desktop/JJ2/UtilQE.cpp
+QueryEditor.h
+/home/nicklks/Desktop/JJ2/QueryEditor.h
+UtilQE.h
+/home/nicklks/Desktop/JJ2/UtilQE.h
+QuickSort.h
+/home/nicklks/Desktop/JJ2/QuickSort.h
+
+/home/nicklks/Desktop/JJ2/UtilQE.h
+QueryEditor.h
+/home/nicklks/Desktop/JJ2/QueryEditor.h
+Hashtable.h
+/home/nicklks/Desktop/JJ2/Hashtable.h
 Types.h
 /home/nicklks/Desktop/JJ2/Types.h
 

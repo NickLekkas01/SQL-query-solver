@@ -159,6 +159,7 @@ std::string *getPredicates(std::string predicates, int *predicatesNum, RelationM
             index++;
         }
     }
+    delete[] visited;
     delete[] temp;
     return temp2;
     //return nullptr;
