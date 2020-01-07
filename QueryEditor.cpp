@@ -153,10 +153,30 @@ void batchExecutor(List1 * batch, Data * data){
     }
 }
 
+RelationCS **initStats(RelationMD **bindings, int numOfBindings) {
+    RelationCS ** rvalue = new RelationCS*[numOfBindings];
+    for (int i = 0; i < numOfBindings; ++i) {
+        rvalue[i] = new RelationCS[bindings[i]->TuplesNum];
+        for (int j = 0; j < bindings[i]->TuplesNum; ++j) {
+            rvalue[i][j] = bindings[i]->statistics[j];
+        }
+    }
+    return rvalue;
+}
+void deleteStats(RelationCS ** stats, int numOfBindings){
+    for (int i = 0; i < numOfBindings; ++i) {
+        delete stats[i];
+    }
+    delete [] stats;
+}
 void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
     // initialize IM results here, send them below.
+
     IMData data;
     initializeIMData(&data, numOfBindings);
+    //initialize query statistics
+    RelationCS ** statistics = initStats(Bindings, numOfBindings);
+
     int * PParts = nullptr;
     uint64_t * temp, *R1, *R2;
     for (int i = 0; i < numOfPredicates; ++i) {
@@ -382,4 +402,6 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     printResults(sumOfProjections, numOfProjections);
     delete[] sumOfProjections;
     deleteIntermediateData(&data);
+    deleteStats(statistics, numOfBindings);
+
 }
