@@ -2,12 +2,15 @@
 #define TEMPPROJ_DBRELATIONSREADER_H
 #include <iostream>
 #include <fstream>
-
+typedef struct RelationColumnStats{
+    uint64_t upperA, lowerA, fA ,distinctA;
+}RelationCS;
 typedef struct RelationMetadata{
-    uint64_t TuplesNum,
-            RowsNum,
+    uint8_t TuplesNum;
+    uint64_t RowsNum,
             *RelationSerialData;
     std::string name;
+    RelationCS * statistics;
 }RelationMD;
 typedef struct GlobalFilesData{
     int relationNum;

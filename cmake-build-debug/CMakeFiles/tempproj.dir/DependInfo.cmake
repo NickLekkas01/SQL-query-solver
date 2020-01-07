@@ -4,15 +4,15 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/nicklks/Desktop/JJ2/DBRelationsReader.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
-  "/home/nicklks/Desktop/JJ2/Hashtable.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/Hashtable.cpp.o"
-  "/home/nicklks/Desktop/JJ2/List.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/List.cpp.o"
-  "/home/nicklks/Desktop/JJ2/QueryEditor.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/QueryEditor.cpp.o"
-  "/home/nicklks/Desktop/JJ2/QueryList.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/QueryList.cpp.o"
-  "/home/nicklks/Desktop/JJ2/QuickSort.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/QuickSort.cpp.o"
-  "/home/nicklks/Desktop/JJ2/UtilQE.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/UtilQE.cpp.o"
-  "/home/nicklks/Desktop/JJ2/Utilities.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/Utilities.cpp.o"
-  "/home/nicklks/Desktop/JJ2/main.cpp" "/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles/tempproj.dir/main.cpp.o"
+  "/home/athena/CLionProjects/temp/DBRelationsReader.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
+  "/home/athena/CLionProjects/temp/Hashtable.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Hashtable.cpp.o"
+  "/home/athena/CLionProjects/temp/List.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/List.cpp.o"
+  "/home/athena/CLionProjects/temp/QueryEditor.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QueryEditor.cpp.o"
+  "/home/athena/CLionProjects/temp/QueryList.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QueryList.cpp.o"
+  "/home/athena/CLionProjects/temp/QuickSort.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QuickSort.cpp.o"
+  "/home/athena/CLionProjects/temp/UtilQE.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/UtilQE.cpp.o"
+  "/home/athena/CLionProjects/temp/Utilities.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Utilities.cpp.o"
+  "/home/athena/CLionProjects/temp/main.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

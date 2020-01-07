@@ -15,9 +15,11 @@ void printDefinedStruct(RelationMD * relationMd){
 void DeleteData(Data * data){
     for (int i = 0; i < data->relationNum; ++i) {
         delete [] data->relationsData[i].RelationSerialData;
+        delete [] data->relationsData[i].statistics;
     }
     delete [] data->relationsData;
     delete data;
+
 }
 int getInitFileLines(const string& fileName){
     ifstream file, file1;
@@ -60,17 +62,28 @@ int getRelationData(const string& fileName, RelationMD * currRelMD){
     file.read((char*)&currRelMD->RowsNum, sizeof(temp1));
     ///cout << currRelMD->RowsNum<< endl;
     file.read((char*)&currRelMD->TuplesNum, sizeof(temp1));
+    currRelMD->statistics = new RelationColumnStats[currRelMD->TuplesNum];
+    for (int k = 0; k < currRelMD->TuplesNum; ++k) {
+        currRelMD->statistics[k].fA = currRelMD->RowsNum;
+    }
     //cout << currRelMD->TuplesNum<< endl;
 
     uint64_t space = (currRelMD->TuplesNum)*(currRelMD->RowsNum);
     currRelMD->RelationSerialData = new uint64_t[space];
-    uint64_t index = 0;
+    uint64_t j = 0, max = 0, min = -1; // negative value in unsigned guarantees max value
     for (uint64_t i = 0 ; i < space ; i++ ){
         file.read((char*)&temp1, sizeof(temp1));
-        currRelMD->RelationSerialData[index] = temp1;
-        //cout << temp1<< endl;
-        //cout << currRelMD->RelationSerialData[index]<<endl;
-        index++;
+        currRelMD->RelationSerialData[i] = temp1;
+        if(temp1 <min)min = temp1;
+        if(temp1>max)max = temp1;
+        if((i+1)%currRelMD->RowsNum == 0 ){
+            currRelMD->statistics[j].lowerA = min;
+            currRelMD->statistics[j].upperA = max;
+            max = 0; min = -1;
+            j++;
+            //reinit max min increase j
+        }
+
 
     }
     currRelMD->name = fileName.substr( fileName.length() - 2 );

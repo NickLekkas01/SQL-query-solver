@@ -35,19 +35,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/clion/99/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /snap/clion/99/bin/cmake/linux/bin/cmake -E remove -f
+RM = /home/athena/Downloads/clion-2019.2.3/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nicklks/Desktop/JJ2
+CMAKE_SOURCE_DIR = /home/athena/CLionProjects/temp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nicklks/Desktop/JJ2/cmake-build-debug
+CMAKE_BINARY_DIR = /home/athena/CLionProjects/temp/cmake-build-debug
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -74,14 +74,14 @@ preinstall:
 CMakeFiles/tempproj.dir/all:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/depend
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target tempproj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target tempproj"
 .PHONY : CMakeFiles/tempproj.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/tempproj.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles 10
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/tempproj.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicklks/Desktop/JJ2/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/tempproj.dir/rule
 
 # Convenience name for target.
