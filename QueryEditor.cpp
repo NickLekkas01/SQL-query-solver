@@ -1,13 +1,27 @@
 //
 // Created by athena on 8/12/19.
 //
+#define FILTERRESNUMINDEX 1
+#define FILTER 1
+#define JOIN 2
 #include "Utilities.h"
 #include "QueryEditor.h"
+#include <cmath>
+#include <set>
+
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
+
 void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections);
+
+
+uint64_t maxInt(const uint64_t a, const uint64_t i);
+
+uint64_t minInt(const uint64_t a, const uint64_t i);
+
+void QueryOptimizer(string *predicates, int bindings, int projections, QueryStats *queryStats);
 
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfPleiades = 0;
@@ -58,7 +72,6 @@ void deleteIntermediateData(IMData * imData){
 
 }
 
-
 void printResults(uint64_t *sumOfProjections, int numOfProjections) {
     cout << "Results:" << endl;
     for(int i = 0; i < numOfProjections; i++){
@@ -66,7 +79,6 @@ void printResults(uint64_t *sumOfProjections, int numOfProjections) {
     }
     cout << endl;
 }
-
 
 void getLists(List1 ** batchdebug, int numbatches, const string &queriesFile){
     ifstream workload(queriesFile);
@@ -124,6 +136,7 @@ void JobExecutor(const string &queriesFile, Data *data) {
     workload.close();
 
 }
+
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
     string QueryParts[QUERYPARTS];
@@ -153,45 +166,171 @@ void batchExecutor(List1 * batch, Data * data){
     }
 }
 
-RelationCS **initStats(RelationMD **bindings, int numOfBindings) {
+RelationCS **initStats(RelationMD **bindings, int numOfBindings, QueryStats *QStats) {
     RelationCS ** rvalue = new RelationCS*[numOfBindings];
+    QStats->TuplesPerBinding = new uint8_t[numOfBindings];
     for (int i = 0; i < numOfBindings; ++i) {
         rvalue[i] = new RelationCS[bindings[i]->TuplesNum];
+        QStats->TuplesPerBinding[i] = bindings[i]->TuplesNum;
         for (int j = 0; j < bindings[i]->TuplesNum; ++j) {
             rvalue[i][j] = bindings[i]->statistics[j];
         }
     }
+    QStats->numOfBindings = numOfBindings;
+    QStats->stats = rvalue;
     return rvalue;
 }
-void deleteStats(RelationCS ** stats, int numOfBindings){
+
+void deleteStats(RelationCS **stats, int numOfBindings, QueryStats Qstats) {
+    delete [] Qstats.TuplesPerBinding;
     for (int i = 0; i < numOfBindings; ++i) {
-        delete stats[i];
+        delete [] stats[i];
     }
     delete [] stats;
 }
+
+void updateStats(QueryStats *statistics, const string& Predicate) {
+    uint64_t lowerA, upperA;
+    uint64_t fA, distinctA;
+    short SwitchValue = typeOfPredicate(Predicate);
+    int  * PParts;
+    uint64_t * PPartsF;
+    switch (SwitchValue){
+        case FILTER:
+            PPartsF = getNumericalValuePredicateParts(Predicate);
+            switch (PPartsF[2]){
+
+                case '=': {
+                    statistics->stats[PPartsF[0]][PPartsF[1]].upperA = statistics->stats[PPartsF[0]]->lowerA = PPartsF[3]; // la = ua = k
+                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
+                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = (statistics->stats[PPartsF[0]]->fA /
+                                                                    statistics->stats[PPartsF[0]]->distinctA);
+                    uint64_t distinctA = statistics[PPartsF[1]].stats[PPartsF[0]]->distinctA;
+                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = 1;
+
+
+                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
+                        if (i == PPartsF[1]) {
+                            continue;
+                        }
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA * (1 -
+                                                                                                                   (pow(1 -
+                                                                                                                        statistics->stats[PPartsF[0]][PPartsF[1]].fA /
+                                                                                                                        fA,
+                                                                                                                        statistics->stats[PPartsF[0]][PPartsF[1]].fA /
+                                                                                                                        statistics->stats[i][PPartsF[1]].distinctA)));
+                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
+                    }
+                }
+
+                    break;
+                case '>':
+                    lowerA = statistics->stats[PPartsF[0]][PPartsF[1]].lowerA;
+                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
+                    statistics->stats[PPartsF[0]][PPartsF[1]].lowerA = maxInt(statistics->stats[PPartsF[0]][PPartsF[1]].lowerA, PPartsF[3]);
+                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/(statistics->stats[PPartsF[0]][PPartsF[1]].upperA-lowerA));
+                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/ (statistics->stats[PPartsF[0]][PPartsF[1]].upperA - lowerA));
+                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
+                        if (i == PPartsF[1]){
+                            continue;
+                        }
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[i][PPartsF[1]].fA/statistics->stats[i][PPartsF[1]].distinctA)));
+                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
+                    }
+                    break;
+                case '<':
+                    upperA = statistics->stats[PPartsF[0]][PPartsF[1]].upperA;
+                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
+                    statistics->stats[PPartsF[0]][PPartsF[1]].upperA = minInt(statistics->stats[PPartsF[0]][PPartsF[1]].upperA, PPartsF[3]);
+                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/(upperA-statistics->stats[PPartsF[0]][PPartsF[1]].lowerA));
+                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = (statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA/ (upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA));
+                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
+                        if (i == PPartsF[1]){
+                            continue;
+                        }
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[i]->fA/statistics->stats[i]->distinctA)));
+                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
+                    }
+                    break;
+            }
+            delete [] PPartsF;
+            break;
+        case JOIN:
+            PParts = getPredicateParts(Predicate);
+            //new lower for both relcolumns in join is max of their two old lower
+            distinctA = statistics->stats[PParts[0]][PParts[1]].distinctA;
+            statistics->stats[PParts[0]][PParts[1]].upperA = statistics->stats[PParts[2]][PParts[3]].upperA = minInt(statistics->stats[PParts[2]][PParts[3]].upperA,statistics->stats[PParts[0]][PParts[1]].upperA);
+
+            //new upper for both relcolumns in join is min of their old two upper
+            statistics->stats[PParts[0]][PParts[1]].lowerA = statistics->stats[PParts[2]][PParts[3]].lowerA = maxInt(statistics->stats[PParts[2]][PParts[3]].lowerA,statistics->stats[PParts[0]][PParts[1]].lowerA);
+            statistics->stats[PParts[0]][PParts[1]].fA = statistics->stats[PParts[2]][PParts[3]].fA = ((statistics->stats[PParts[0]][PParts[1]].fA * statistics->stats[PParts[2]][PParts[3]].fA )/(statistics->stats[PParts[0]][PParts[1]].upperA - statistics->stats[PParts[0]][PParts[1]].lowerA +1));
+            statistics->stats[PParts[0]][PParts[1]].distinctA = statistics->stats[PParts[2]][PParts[3]].distinctA = ((statistics->stats[PParts[0]][PParts[1]].distinctA * statistics->stats[PParts[2]][PParts[3]].distinctA )/(statistics->stats[PParts[0]][PParts[1]].upperA - statistics->stats[PParts[0]][PParts[1]].lowerA+1));
+
+            //for rest of columns in both
+            for (int i = 0; i < statistics->TuplesPerBinding[PParts[0]]; ++i) { // foreach column in relation
+                if (i == PParts[1]){
+                    continue;
+                }
+                statistics->stats[PParts[0]][i].distinctA = statistics->stats[PParts[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PParts[0]][PParts[1]].distinctA/distinctA, statistics->stats[PParts[0]][i].fA/statistics->stats[PParts[0]][i].distinctA)));
+                statistics->stats[PParts[0]][i].fA = statistics->stats[PParts[0]][PParts[1]].fA;
+            }
+            distinctA = statistics->stats[PParts[2]][PParts[3]].distinctA;
+
+            //new upper for both relcolumns in join is min of their old two upper
+
+            //for rest of columns in both
+            for (int i = 0; i < statistics->TuplesPerBinding[PParts[2]]; ++i) { // foreach column in relation
+                if (i == PParts[3]){
+                    continue;
+                }
+                statistics->stats[PParts[2]][i].distinctA = statistics->stats[PParts[2]][i].distinctA*(1 - ( pow(1 -statistics->stats[PParts[2]][PParts[3]].distinctA/distinctA, statistics->stats[PParts[2]][i].fA/statistics->stats[PParts[2]][i].distinctA)));
+                statistics->stats[PParts[2]][i].fA = statistics->stats[PParts[2]][PParts[3]].fA;
+            }
+            delete [] PParts;
+            break;
+    }
+}
+
+uint64_t minInt(const uint64_t a, const uint64_t i) {
+    return ((a<i)? a: i);
+}
+
+uint64_t maxInt(const uint64_t a, const uint64_t i) {
+    return ((a>i)? a: i);
+    return 0;
+}
+
 void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
     // initialize IM results here, send them below.
 
     IMData data;
     initializeIMData(&data, numOfBindings);
     //initialize query statistics
-    RelationCS ** statistics = initStats(Bindings, numOfBindings);
+    QueryStats QStats;
+    RelationCS ** statistics = initStats(Bindings, numOfBindings, &QStats);
 
     int * PParts = nullptr;
+    uint64_t * PPartsF = nullptr;
     uint64_t * temp, *R1, *R2;
+    QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
+    //delete statistics;
+
+    deleteStats(statistics, numOfBindings, QStats);//here
+    deleteIntermediateData(&data);//here
+    return;
     for (int i = 0; i < numOfPredicates; ++i) {
         cout <<"Now processing Predicate "<< Predicates[i]<<endl;
-        ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
-
-        switch(typeOfPredicate(Predicates[i])){
+        //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
+        short switchValue =typeOfPredicate(Predicates[i]);
+        switch(switchValue){
             case 1: //we have a column value compare to number
                 //get binded value(pointer to relation) , column value and operator, execute query
+
                 temp = ExecuteNumericalValueQuery(Predicates[i], Bindings, numOfBindings,&data);
+                //PPartsF = getNumericalValuePredicateParts(Predicates[i]);
+                //updateStats(&QStats, switchValue, PPartsF, data, temp[1]);
 
-                for (int k = 0; k < temp[1]; ++k) {
-                    fchecker << temp[k] + 1<<endl;
-                }
-
+                //delete [] PPartsF;
                 //add to im results
                 break;
             case 2:
@@ -232,9 +371,9 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     rel1->num_tuples = Bindings[PParts[0]]->RowsNum;
                     rel1->tuples = new Tuple[rel1->num_tuples];
                     getDataFromBindings(Bindings[PParts[0]],PParts[1], rel1);
-                    for (int j = 0; j < rel1->num_tuples; ++j) {
-                        bindcheck1 << rel1->tuples[j].key<< " " << rel1->tuples[j].payload << endl;
-                    }
+//                    for (int j = 0; j < rel1->num_tuples; ++j) {
+//                        bindcheck1 << rel1->tuples[j].key<< " " << rel1->tuples[j].payload << endl;
+//                    }
                     //get data from bindings
                 }
                 if (data.visitedJoint[PParts[2]]){
@@ -252,34 +391,34 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
                     rel2->num_tuples = Bindings[PParts[2]]->RowsNum;
                     rel2->tuples = new Tuple[rel2->num_tuples];
                     getDataFromBindings(Bindings[PParts[2]],PParts[3], rel2);
-                    for (int j = 0; j < rel2->num_tuples; ++j) {
-                        bindcheck2 << rel2->tuples[j].key<< " " << rel2->tuples[j].payload << endl;
-                    }
+//                    for (int j = 0; j < rel2->num_tuples; ++j) {
+//                        bindcheck2 << rel2->tuples[j].key<< " " << rel2->tuples[j].payload << endl;
+//                    }
                 }
-                ofstream r1txt ("R1.txt");
-                ofstream r2txt ("R2.txt");
-                for (uint64_t  l = 0; l < rel1->num_tuples; ++l) {
-                    r1txt<<rel1->tuples->key;
-                    r1txt<<rel1->tuples->payload;
-                }
-                for (uint64_t  l = 0; l < rel2->num_tuples; ++l) {
-                    r2txt<<rel2->tuples->key;
-                    r2txt<<rel2->tuples->payload;
-                }
-                r1txt.close();
-                r2txt.close();
-                ofstream checker("Checker.txt");
+                //ofstream r1txt ("R1.txt");
+                //ofstream r2txt ("R2.txt");
+//                for (uint64_t  l = 0; l < rel1->num_tuples; ++l) {
+//                    r1txt<<rel1->tuples->key;
+//                    r1txt<<rel1->tuples->payload;
+//                }
+//                for (uint64_t  l = 0; l < rel2->num_tuples; ++l) {
+//                    r2txt<<rel2->tuples->key;
+//                    r2txt<<rel2->tuples->payload;
+//                }
+//                r1txt.close();
+//                r2txt.close();
+                //ofstream checker("Checker.txt");
                 Result *result = SortMergeJoin(rel1, rel2);
                 List *temp = result->startOfList;
                 while(temp!= NULL) {
-                    for(uint64_t w =0; w < temp->index; w++){
-                        checker<<temp->rowIDR[w]<<" ";
-                        checker<<temp->rowIDS[w];
-                        checker << endl;
-                    }
+//                    for(uint64_t w =0; w < temp->index; w++){
+//                        checker<<temp->rowIDR[w]<<" ";
+//                        checker<<temp->rowIDS[w];
+//                        checker << endl;
+//                    }
                     temp = temp->next;
                 }
-                checker.close();
+                //checker.close();
 //                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
 //                R1[0] = (uint64_t )PParts[0];
 //                R2[0] = (uint64_t )PParts[2];
@@ -402,6 +541,32 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     printResults(sumOfProjections, numOfProjections);
     delete[] sumOfProjections;
     deleteIntermediateData(&data);
-    deleteStats(statistics, numOfBindings);
+    deleteStats(statistics, numOfBindings, QStats);
 
+}
+
+typedef struct opt {
+    uint64_t cost = 0;
+    int * tree = nullptr;
+    set<int> S;
+}HashTable;
+
+void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
+    HashTable * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
+    uint64_t * temp;
+    for (int j = 0; j < pow(2, bindings) - 1; ++j) {
+        BestTree[j].cost = 0;
+        BestTree[j].tree = nullptr;
+    }
+    for (int k = 0; k < predicates; ++k) {
+        if(typeOfPredicate(Predicates[k]) != 1)break;
+        //temp = getNumericalValuePredicateParts(Predicates[k]);
+        updateStats(queryStats, Predicates[k]);
+        //delete [] temp;
+    }
+    //apo k mexri telos exei join pou 8a melethsoume
+    for (int i = 0; i < bindings; ++i) {
+
+    }
+    delete [] BestTree;
 }

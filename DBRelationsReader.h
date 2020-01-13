@@ -2,9 +2,15 @@
 #define TEMPPROJ_DBRELATIONSREADER_H
 #include <iostream>
 #include <fstream>
+
 typedef struct RelationColumnStats{
-    uint64_t upperA, lowerA, fA ,distinctA;
+    uint64_t upperA, lowerA,fA ,distinctA;
 }RelationCS;
+typedef struct QueryStatistics{
+    uint8_t numOfBindings;
+    uint8_t * TuplesPerBinding;
+    RelationCS ** stats;
+}QueryStats;
 typedef struct RelationMetadata{
     uint8_t TuplesNum;
     uint64_t RowsNum,

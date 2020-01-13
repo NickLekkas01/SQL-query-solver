@@ -15,6 +15,17 @@ typedef struct listC{
     ListNode * end = nullptr;
     int queriesNum = 0;
 }List1;
+typedef struct IlistN{
+    uint64_t value;
+
+    struct IlistN * next;
+}IListNode;
+
+typedef struct IlistC{
+    IListNode * start = nullptr;
+    IListNode * end = nullptr;
+    int queriesNum = 0;
+}List2;
 void AddToList(List1 * list, std::string value );
 void DeleteList(List1 * list);
 

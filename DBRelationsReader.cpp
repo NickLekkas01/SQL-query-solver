@@ -5,11 +5,6 @@ void printDefinedStruct(RelationMD * relationMd){
     cout << "testing final product\n";
     cout << relationMd->RowsNum << " "<< relationMd->TuplesNum<<endl;
     cout << relationMd->name<<endl;
-    //for(uint64_t i =0 ; i < relationMd->RowsNum *relationMd->TuplesNum;i++){
-
-        //cout << relationMd->RelationSerialData[i]<<endl;
-
-    //}
 
 }
 void DeleteData(Data * data){
@@ -19,6 +14,7 @@ void DeleteData(Data * data){
     }
     delete [] data->relationsData;
     delete data;
+
 
 }
 int getInitFileLines(const string& fileName){
@@ -47,6 +43,12 @@ int getInitFileLines(const string& fileName){
     return lineCount;
     // end of file line pulling
 }
+void initTemp(bool *pInt, uint64_t pleiades) {
+    for (uint64_t i = 0; i < pleiades; ++i) {
+        pInt[i] = false;
+    }
+
+}
 int getRelationData(const string& fileName, RelationMD * currRelMD){
     ifstream file;
 
@@ -64,13 +66,13 @@ int getRelationData(const string& fileName, RelationMD * currRelMD){
     file.read((char*)&currRelMD->TuplesNum, sizeof(temp1));
     currRelMD->statistics = new RelationColumnStats[currRelMD->TuplesNum];
     for (int k = 0; k < currRelMD->TuplesNum; ++k) {
-        currRelMD->statistics[k].fA = currRelMD->RowsNum;
+        currRelMD->statistics[k].fA = (double)currRelMD->RowsNum;
     }
     //cout << currRelMD->TuplesNum<< endl;
-
+    uint64_t alloc;
     uint64_t space = (currRelMD->TuplesNum)*(currRelMD->RowsNum);
     currRelMD->RelationSerialData = new uint64_t[space];
-    uint64_t j = 0, max = 0, min = -1; // negative value in unsigned guarantees max value
+    uint64_t j = 0, max = 0, min = -1, distinct = 0; // negative value in unsigned guarantees max value
     for (uint64_t i = 0 ; i < space ; i++ ){
         file.read((char*)&temp1, sizeof(temp1));
         currRelMD->RelationSerialData[i] = temp1;
@@ -79,8 +81,22 @@ int getRelationData(const string& fileName, RelationMD * currRelMD){
         if((i+1)%currRelMD->RowsNum == 0 ){
             currRelMD->statistics[j].lowerA = min;
             currRelMD->statistics[j].upperA = max;
+            if(max - min +1 > 50000000){  alloc = 50000000; }else{  alloc = max - min +1;}
+            bool *distinctCalc = new bool[alloc];
+            initTemp(distinctCalc, alloc);
+
+            for (uint64_t k = 0; k < currRelMD->RowsNum; ++k) {
+                distinctCalc[currRelMD->RelationSerialData[k + j*currRelMD->RowsNum] - min] = true;
+            }
+            for (uint64_t l = 0; l < alloc; ++l) {
+                if(distinctCalc[l]){
+                    distinct = distinct + 1;}
+                }
+            currRelMD->statistics[j].distinctA = distinct;
             max = 0; min = -1;
+            distinct = 0;
             j++;
+            delete [] distinctCalc;
             //reinit max min increase j
         }
 

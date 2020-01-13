@@ -34,6 +34,7 @@ int getNumOfPredicates(std::string predicates) ;
 short typeOfPredicate(const std::string& Predicate);
 std::string *getPredicates(std::string predicates, int *predicatesNum, RelationMD **Bindings);
 int **getProjections(std::string projections, int **Projections, int numOfBindings, int *numOfProjections);
+uint64_t * getNumericalValuePredicateParts(std::string Predicate);
 
 uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int PredicateParts[4]);
 uint64_t *ExecuteNumericalValueQuery(std::string Predicate, RelationMD **Bindings, int numOfBindings, IMData * data);

@@ -1,10 +1,11 @@
 //
 // Created by athena on 13/12/19.
 //
+
+//data->filters[][1] = results num of filter.
 #include "QueryEditor.h"
 #include "UtilQE.h"
 #include "QuickSort.h"
-
 void initTemp(uint64_t *pInt, uint64_t pleiades);
 
 void printTemp(uint64_t *pInt, uint64_t num);
@@ -250,6 +251,34 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
     //return value array
     return rvalue;
 }
+
+uint64_t * getNumericalValuePredicateParts(string Predicate) {
+    uint64_t * rvalue = new uint64_t[4];
+    //int rvalue[4];
+    size_t pos = 0;
+    string token;
+    pos = Predicate.find('.');
+    token = Predicate.substr(0, pos);
+    rvalue[0] = stoi(token);
+    Predicate.erase(0, pos + 1);
+    pos = Predicate.find('=');
+    if(pos == string::npos){
+        pos = Predicate.find('<');
+    }
+    if(pos == string::npos){
+        pos = Predicate.find('>');
+    }
+    token = Predicate.substr(0, pos);
+    rvalue[1] = stoi(token);
+    Predicate.erase(0, pos );
+    rvalue[2] = Predicate[0];
+    Predicate.erase(0, 1 );
+    rvalue[3] = stoi(Predicate);
+
+
+
+    return rvalue;
+}
 int * getPredicateParts(string Predicate){
     size_t pos = 0;
     string token;
@@ -366,7 +395,7 @@ void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int colu
             resNum++;
         }
         temp[data->IMResColumnsForJoin[i * pleiada_size + pos]] = true;
-        cout << "";
+        //cout << "";
         //if(temp[data->IMResColumnsForJoin[i * pleiada_size + pos]])resNum++;
     }
     relation->num_tuples = resNum;
@@ -385,12 +414,7 @@ void printTemp(uint64_t *pInt, uint64_t num) {
 
 }
 
-void initTemp(uint64_t *pInt, uint64_t pleiades) {
-    for (int i = 0; i < pleiades; ++i) {
-        pInt[i] = - 1;
-    }
 
-}
 
 
 
