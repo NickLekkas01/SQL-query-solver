@@ -645,7 +645,7 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
                     continue;
                 }
                 setter.insert(j);
-                
+
 
             }
         }
