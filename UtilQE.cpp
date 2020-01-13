@@ -420,10 +420,10 @@ void combinationUtil(int *arr, int n, int r, int index, int *data, int i, int **
         setIter[*indexOfOuter] = new int[r];
         for (int j = 0; j < r; j++){
             setIter[*indexOfOuter][j] = data[j];
-            printf("%d ", data[j]);
+            //printf("%d ", data[j]);
         }
         *indexOfOuter = (*indexOfOuter) + 1;
-        printf("\n");
+        //printf("\n");
         return;
     }
 

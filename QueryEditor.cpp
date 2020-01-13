@@ -8,7 +8,7 @@
 #include "QueryEditor.h"
 #include <cmath>
 #include <set>
-
+#define NoCrossProducts 1
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
@@ -315,9 +315,9 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
     //delete statistics;
 
-    deleteStats(statistics, numOfBindings, QStats);//here
-    deleteIntermediateData(&data);//here
-    return;
+    //deleteStats(statistics, numOfBindings, QStats);//here
+    //deleteIntermediateData(&data);//here
+    //return;
     for (int i = 0; i < numOfPredicates; ++i) {
         cout <<"Now processing Predicate "<< Predicates[i]<<endl;
         //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
@@ -604,6 +604,31 @@ void deleteAdjacency(bool **pBoolean, int bindings) {
     delete [] pBoolean;
 }
 
+bool connected(int R, bool **adjacency, const set<int>& set1, int bindings) {
+    set <int>::iterator it = set1.begin();
+
+    while (it!= set1.end()){
+        if(adjacency[*it][R])return true;
+        it++;
+    }
+    return false;
+}
+
+int * GetBestTree(const set<int> &set1, HashTable *BestTree, int iterator) {
+    auto it = set1.begin();
+    for (int i = 0; i < iterator; ++i) {
+        if (BestTree[i].S == set1){
+            return BestTree[i].tree;
+            cout<<"";
+        }
+    }
+    return nullptr;
+}
+
+int cost(int *pInt, string *predicates, int numOfPred, int treeIter, QueryStats *qstats) {
+    return 0;
+}
+
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
     HashTable * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
     int * relationSet = new int [bindings];
@@ -625,6 +650,8 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     }
     //apo k mexri telos exei join pou 8a melethsoume
     for (int i = 0; i < bindings; ++i) {
+        BestTree[i].tree = new int[1];
+        BestTree[i].tree[0] = i;
         BestTree[i].S.insert(i);
     }
     int * currSet;
@@ -644,8 +671,14 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
                 if(inCurrSet(j, currSet, l)){
                     continue;
                 }
-                setter.insert(j);
-
+                if(!connected(j, adjacencyMatrix, setter, bindings && NoCrossProducts)){
+                    continue;
+                }
+                set<int> St(setter);
+                St.insert(j);
+                int * currTree = GetBestTree(St, BestTree, (int)(pow(2, bindings) - 1));
+                if(cost(GetBestTree(St, BestTree, (int) (pow(2, bindings) - 1)), Predicates, predicates, 0, queryStats) > cost(currTree, nullptr, 0, 0,nullptr) || currTree == nullptr ){}
+                //if BestTree(St) == NULL || costBestTree(St) > cost(CurrTree) replace
 
             }
         }
@@ -656,6 +689,9 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
         delete [] setIterator;
     }
     deleteAdjacency(adjacencyMatrix, bindings);
+    for (int m = 0; m < (int) (pow(2, bindings) - 1); ++m) {
+        delete [] BestTree[m].tree;
+    }
     delete [] BestTree;
     delete [] relationSet;
 }
