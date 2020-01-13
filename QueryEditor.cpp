@@ -572,12 +572,21 @@ int combinationFormula(int n, int r){
 
 bool **initAdjacencyMatrix(int bindings, string *Predicates, int predNum) {
     bool ** rvalue = new bool*[bindings];
+    int * temp;
     for (int i = 0; i < bindings; ++i) {
         rvalue[i] = new bool[bindings];
         for (int j = 0; j < bindings; ++j) {
             rvalue[i][j] = false;
         }
     }
+    for (int k = 0; k < predNum; ++k) {
+        if(typeOfPredicate(Predicates[k]) == FILTER)continue;
+        temp = getPredicateParts(Predicates[k]);
+        if(temp[0] == temp[2]){delete []temp;continue;}
+        rvalue[temp[0]][temp[2]] = true;
+        delete [] temp;
+    }
+    return rvalue;
 }
 
 bool inCurrSet(int j, const int *currSet, int setIter) {
@@ -586,6 +595,13 @@ bool inCurrSet(int j, const int *currSet, int setIter) {
             return true;}
     }
     return false;
+}
+
+void deleteAdjacency(bool **pBoolean, int bindings) {
+    for (int i = 0; i < bindings; ++i) {
+        delete[] pBoolean[i];
+    }
+    delete [] pBoolean;
 }
 
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
@@ -609,24 +625,27 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     }
     //apo k mexri telos exei join pou 8a melethsoume
     for (int i = 0; i < bindings; ++i) {
-        //BestTree[i].S.insert(i);
+        BestTree[i].S.insert(i);
     }
     int * currSet;
     int temp;
+
     for (int l = 1; l <= bindings; ++l) {
         //get all subsets of
         setIterator = new int*[combinationFormula(bindings, l)];
         printCombination(relationSet, bindings, l, setIterator);
         cout <<endl;
         for (int i = 0; i < combinationFormula(bindings, l); ++i) {
-            currSet = setIterator[i];
-            for (int j = 0; j < bindings; ++j) {
 
+            currSet = setIterator[i];
+
+            for (int j = 0; j < bindings; ++j) {
+                set <int> setter(currSet, currSet + l);
                 if(inCurrSet(j, currSet, l)){
                     continue;
                 }
-
-
+                setter.insert(j);
+                
 
             }
         }
@@ -636,6 +655,7 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
         }
         delete [] setIterator;
     }
+    deleteAdjacency(adjacencyMatrix, bindings);
     delete [] BestTree;
     delete [] relationSet;
 }
