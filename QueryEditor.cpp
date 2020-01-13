@@ -205,7 +205,7 @@ void updateStats(QueryStats *statistics, const string& Predicate) {
                     fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
                     statistics->stats[PPartsF[0]][PPartsF[1]].fA = (statistics->stats[PPartsF[0]]->fA /
                                                                     statistics->stats[PPartsF[0]]->distinctA);
-                    uint64_t distinctA = statistics[PPartsF[1]].stats[PPartsF[0]]->distinctA;
+                    uint64_t distinctA = statistics->stats[PPartsF[0]][PPartsF[1]].distinctA;
                     statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = 1;
 
 
@@ -213,28 +213,27 @@ void updateStats(QueryStats *statistics, const string& Predicate) {
                         if (i == PPartsF[1]) {
                             continue;
                         }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA * (1 -
-                                                                                                                   (pow(1 -
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA * (1 -(pow(1 -
                                                                                                                         statistics->stats[PPartsF[0]][PPartsF[1]].fA /
                                                                                                                         fA,
-                                                                                                                        statistics->stats[PPartsF[0]][PPartsF[1]].fA /
-                                                                                                                        statistics->stats[i][PPartsF[1]].distinctA)));
+                                                                                                                        statistics->stats[PPartsF[0]][i].fA /
+                                                                                                                        statistics->stats[PPartsF[0]][i].distinctA)));
                         statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
                     }
                 }
 
-                    break;
+                break;
                 case '>':
                     lowerA = statistics->stats[PPartsF[0]][PPartsF[1]].lowerA;
                     fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
                     statistics->stats[PPartsF[0]][PPartsF[1]].lowerA = maxInt(statistics->stats[PPartsF[0]][PPartsF[1]].lowerA, PPartsF[3]);
-                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/(statistics->stats[PPartsF[0]][PPartsF[1]].upperA-lowerA));
+                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((uint64_t)((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)*statistics->stats[PPartsF[0]][PPartsF[1]].distinctA)/(statistics->stats[PPartsF[0]][PPartsF[1]].upperA-lowerA));
                     statistics->stats[PPartsF[0]][PPartsF[1]].fA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/ (statistics->stats[PPartsF[0]][PPartsF[1]].upperA - lowerA));
                     for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
                         if (i == PPartsF[1]){
                             continue;
                         }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[i][PPartsF[1]].fA/statistics->stats[i][PPartsF[1]].distinctA)));
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[PPartsF[0]][i].fA/statistics->stats[PPartsF[0]][i].distinctA)));
                         statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
                     }
                     break;
@@ -248,12 +247,13 @@ void updateStats(QueryStats *statistics, const string& Predicate) {
                         if (i == PPartsF[1]){
                             continue;
                         }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[i]->fA/statistics->stats[i]->distinctA)));
+                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[PPartsF[0]][i].fA/statistics->stats[PPartsF[0]][i].distinctA)));
                         statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
                     }
                     break;
             }
             delete [] PPartsF;
+            // */
             break;
         case JOIN:
             PParts = getPredicateParts(Predicate);
@@ -548,25 +548,40 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
 typedef struct opt {
     uint64_t cost = 0;
     int * tree = nullptr;
-    set<int> S;
+    set<int>  S;
 }HashTable;
+
+void initSet(int *pInt, int bindings) {
+    for (int i = 0; i < bindings; ++i) {
+        pInt[i] = i;
+    }
+}
 
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
     HashTable * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
-    uint64_t * temp;
+    int * relationSet = new int [bindings];
+    initSet(relationSet, bindings);
+
+    bool ** adjacencyMatrix;
     for (int j = 0; j < pow(2, bindings) - 1; ++j) {
         BestTree[j].cost = 0;
         BestTree[j].tree = nullptr;
     }
+    //init for filters - questions
     for (int k = 0; k < predicates; ++k) {
-        if(typeOfPredicate(Predicates[k]) != 1)break;
+        if(typeOfPredicate(Predicates[k]) != 1)continue;
         //temp = getNumericalValuePredicateParts(Predicates[k]);
         updateStats(queryStats, Predicates[k]);
         //delete [] temp;
     }
     //apo k mexri telos exei join pou 8a melethsoume
     for (int i = 0; i < bindings; ++i) {
-
+        BestTree[i].S.insert(i);
+    }
+    for (int l = 1; l <= bindings; ++l) {
+        //get all subsets of
+        printCombination(relationSet, bindings, l);
     }
     delete [] BestTree;
+    delete [] relationSet;
 }

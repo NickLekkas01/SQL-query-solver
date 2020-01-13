@@ -62,4 +62,8 @@ void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uin
 void putInBuffer(uint64_t *buffer, uint64_t index, uint64_t *ImRes, int iterationIndex);
 
 void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex);
+
+void printCombination(int arr[], int n, int r);
+
+
 #endif //TEMPPROJ_UTILQE_H
