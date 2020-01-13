@@ -414,20 +414,15 @@ void printTemp(uint64_t *pInt, uint64_t num) {
 
 }
 
-void printCombination(int *arr, int n, int r) {
-    // A temporary array to store all combination
-    // one by one
-    int data[r];
-
-    // Print all combination using temprary array 'data[]'
-    combinationUtil(arr, n, r, 0, data, 0);
-}
-
-void combinationUtil(int *arr, int n, int r, int index, int *data, int i) {
+void combinationUtil(int *arr, int n, int r, int index, int *data, int i, int **setIter, int *indexOfOuter) {
     // Current cobination is ready, print it
     if (index == r) {
-        for (int j = 0; j < r; j++)
+        setIter[*indexOfOuter] = new int[r];
+        for (int j = 0; j < r; j++){
+            setIter[*indexOfOuter][j] = data[j];
             printf("%d ", data[j]);
+        }
+        *indexOfOuter = (*indexOfOuter) + 1;
         printf("\n");
         return;
     }
@@ -438,12 +433,21 @@ void combinationUtil(int *arr, int n, int r, int index, int *data, int i) {
 
     // current is included, put next at next location
     data[index] = arr[i];
-    combinationUtil(arr, n, r, index + 1, data, i + 1);
+    combinationUtil(arr, n, r, index + 1, data, i + 1, setIter, indexOfOuter);
 
     // current is excluded, replace it with next
     // (Note that i+1 is passed, but index is not
     // changed)
-    combinationUtil(arr, n, r, index, data, i + 1);
+    combinationUtil(arr, n, r, index, data, i + 1, setIter, indexOfOuter);
+}
+
+void printCombination(int arr[], int n, int r, int **setIter) {
+    // A temporary array to store all combination
+    // one by one
+    int data[r];
+    int indexOfOuter = 0;
+    // Print all combination using temprary array 'data[]'
+    combinationUtil(arr, n, r, 0, data, 0, setIter, &indexOfOuter );
 }
 
 

@@ -63,7 +63,7 @@ void putInBuffer(uint64_t *buffer, uint64_t index, uint64_t *ImRes, int iteratio
 
 void putInImResults(uint64_t *buffer, uint64_t *Results, uint64_t index, int iterationIndex);
 
-void printCombination(int arr[], int n, int r);
+void printCombination(int arr[], int n, int r, int **setIter);
 
 
 #endif //TEMPPROJ_UTILQE_H

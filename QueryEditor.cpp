@@ -556,13 +556,46 @@ void initSet(int *pInt, int bindings) {
         pInt[i] = i;
     }
 }
+int combinationFormula(int n, int r){
+    int temp1=1, temp2=1, temp3=1;
+    for (int i = 1; i <= n; ++i) {
+        temp1*=i;
+    }
+    for (int i = 1; i <= r; ++i) {
+        temp2*=i;
+    }
+    for (int i = 1; i <= n -r; ++i) {
+        temp3*=i;
+    }
+    return temp1/(temp2*temp3);
+}
+
+bool **initAdjacencyMatrix(int bindings, string *Predicates, int predNum) {
+    bool ** rvalue = new bool*[bindings];
+    for (int i = 0; i < bindings; ++i) {
+        rvalue[i] = new bool[bindings];
+        for (int j = 0; j < bindings; ++j) {
+            rvalue[i][j] = false;
+        }
+    }
+}
+
+bool inCurrSet(int j, const int *currSet, int setIter) {
+    for (int k = 0; k < setIter; ++k) {
+        if(currSet[k] == j){
+            return true;}
+    }
+    return false;
+}
 
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
     HashTable * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
     int * relationSet = new int [bindings];
     initSet(relationSet, bindings);
 
-    bool ** adjacencyMatrix;
+    bool ** adjacencyMatrix = initAdjacencyMatrix(bindings, Predicates, predicates);
+
+    int ** setIterator = nullptr;
     for (int j = 0; j < pow(2, bindings) - 1; ++j) {
         BestTree[j].cost = 0;
         BestTree[j].tree = nullptr;
@@ -571,16 +604,37 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     for (int k = 0; k < predicates; ++k) {
         if(typeOfPredicate(Predicates[k]) != 1)continue;
         //temp = getNumericalValuePredicateParts(Predicates[k]);
-        updateStats(queryStats, Predicates[k]);
+        //updateStats(queryStats, Predicates[k]);
         //delete [] temp;
     }
     //apo k mexri telos exei join pou 8a melethsoume
     for (int i = 0; i < bindings; ++i) {
-        BestTree[i].S.insert(i);
+        //BestTree[i].S.insert(i);
     }
+    int * currSet;
+    int temp;
     for (int l = 1; l <= bindings; ++l) {
         //get all subsets of
-        printCombination(relationSet, bindings, l);
+        setIterator = new int*[combinationFormula(bindings, l)];
+        printCombination(relationSet, bindings, l, setIterator);
+        cout <<endl;
+        for (int i = 0; i < combinationFormula(bindings, l); ++i) {
+            currSet = setIterator[i];
+            for (int j = 0; j < bindings; ++j) {
+
+                if(inCurrSet(j, currSet, l)){
+                    continue;
+                }
+
+
+
+            }
+        }
+
+        for (int i = 0; i < combinationFormula(bindings, l); ++i) {
+            delete [] setIterator[i];
+        }
+        delete [] setIterator;
     }
     delete [] BestTree;
     delete [] relationSet;
