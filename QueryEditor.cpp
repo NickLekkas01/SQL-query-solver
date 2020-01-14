@@ -8,6 +8,7 @@
 #include "QueryEditor.h"
 #include <cmath>
 #include <set>
+#include "Perm.h"
 #define NoCrossProducts 1
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
@@ -15,7 +16,7 @@ void printResults(uint64_t *sumOfProjections, int numOfProjections);
 using namespace std;
 
 void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections);
-
+void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStats *queryStats);
 
 uint64_t maxInt(const uint64_t a, const uint64_t i);
 
@@ -179,7 +180,7 @@ RelationCS **initStats(RelationMD **bindings, int numOfBindings, QueryStats *QSt
     QStats->numOfBindings = numOfBindings;
     QStats->stats = rvalue;
     return rvalue;
-}
+} // todo transport to util qe
 
 void deleteStats(RelationCS **stats, int numOfBindings, QueryStats Qstats) {
     delete [] Qstats.TuplesPerBinding;
@@ -312,12 +313,12 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     int * PParts = nullptr;
     uint64_t * PPartsF = nullptr;
     uint64_t * temp, *R1, *R2;
-    QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
+    QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
     //delete statistics;
 
-    //deleteStats(statistics, numOfBindings, QStats);//here
-    //deleteIntermediateData(&data);//here
-    //return;
+    deleteStats(statistics, numOfBindings, QStats);//here
+    deleteIntermediateData(&data);//here
+    return;
     for (int i = 0; i < numOfPredicates; ++i) {
         cout <<"Now processing Predicate "<< Predicates[i]<<endl;
         //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
@@ -569,7 +570,14 @@ int combinationFormula(int n, int r){
     }
     return temp1/(temp2*temp3);
 }
+int permutationFormula(int n){
+    int temp1=1;
+    for (int i = 1; i <= n; ++i) {
+        temp1*=i;
+    }
 
+    return temp1;
+}
 bool **initAdjacencyMatrix(int bindings, string *Predicates, int predNum) {
     bool ** rvalue = new bool*[bindings];
     int * temp;
@@ -695,3 +703,82 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     delete [] BestTree;
     delete [] relationSet;
 }
+void CombinationRepetitionUtil(int chosen[], int arr[],
+                               int index, int r, int start, int end)
+{
+    // Since index has become r, current combination is
+    // ready to be printed, print
+    if (index == r)
+    {
+        for (int i = 0; i < r; i++)
+            printf("%d ", arr[chosen[i]]);
+        printf("\n");
+        return;
+    }
+
+    // One by one choose all elements (without considering
+    // the fact whether element is already chosen or not)
+    // and recur
+    for (int i = start; i <= end; i++)
+    {
+        chosen[index] = i;
+        CombinationRepetitionUtil(chosen, arr, index + 1,
+                                  r, i, end);
+    }
+    return;
+}
+bool isNotSCE(string basicString) {
+    int* temp = getPredicateParts(basicString);
+    bool rvalue = (temp[0] != temp[2]);
+    delete[]temp;
+    return rvalue;
+}
+
+void CombinationRepetition(int arr[], int n, int r)
+{
+    // Allocate memory
+    int chosen[r+1];
+
+    // Call the recursice function
+    CombinationRepetitionUtil(chosen, arr, 0, r, 0, n-1);
+}
+
+void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
+    int i;
+    for ( i = 0; i < predicates; ++i) {
+
+        if(typeOfPredicate(Predicates[i])!=FILTER && isNotSCE(Predicates[i])){
+            break;
+        }
+    }
+    int numOfJoins = bindings - i, ** setIterator = nullptr;
+    int * setArray = new int[numOfJoins];
+    for (int l = 0; l < numOfJoins; ++l) {
+        setArray[l] = i+l;
+    }
+    setIterator = new int*[permutationFormula(numOfJoins)];
+
+    permutationCaller(setArray, 0, numOfJoins - 1, setIterator);
+    uint64_t cost = -1, newCost=0;
+    int pos;
+    for (int k = 0; k < permutationFormula(numOfJoins); ++k) {
+        //copystats
+        for (int j = 0; j < numOfJoins; ++j) {
+            cout << Predicates[setIterator[k][j]]<<" ";
+            //get cost of this series of predicates
+            if(newCost<cost){
+                cost = newCost;
+                pos = k;
+            }
+        }
+        cout <<endl;
+    }
+    for (int j = 0; j < permutationFormula(numOfJoins); ++j) {
+        delete [] setIterator[j];
+    }
+    delete [] setArray;
+    delete [] setIterator;
+}
+
+
+

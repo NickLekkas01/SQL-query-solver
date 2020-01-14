@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/athena/CLionProjects/temp/DBRelationsReader.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
   "/home/athena/CLionProjects/temp/Hashtable.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Hashtable.cpp.o"
   "/home/athena/CLionProjects/temp/List.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/List.cpp.o"
+  "/home/athena/CLionProjects/temp/Perm.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Perm.cpp.o"
   "/home/athena/CLionProjects/temp/QueryEditor.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QueryEditor.cpp.o"
   "/home/athena/CLionProjects/temp/QueryList.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QueryList.cpp.o"
   "/home/athena/CLionProjects/temp/QuickSort.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QuickSort.cpp.o"

@@ -102,6 +102,12 @@
 		<Unit filename="/home/athena/CLionProjects/temp/List.h">
 			<Option target="tempproj"/>
 		</Unit>
+		<Unit filename="/home/athena/CLionProjects/temp/Perm.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/temp/Perm.h">
+			<Option target="tempproj"/>
+		</Unit>
 		<Unit filename="/home/athena/CLionProjects/temp/QueryEditor.cpp">
 			<Option target="tempproj"/>
 		</Unit>

@@ -204,6 +204,33 @@ List.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/List.cpp.s
 .PHONY : List.cpp.s
 
+Perm.o: Perm.cpp.o
+
+.PHONY : Perm.o
+
+# target to build an object file
+Perm.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Perm.cpp.o
+.PHONY : Perm.cpp.o
+
+Perm.i: Perm.cpp.i
+
+.PHONY : Perm.i
+
+# target to preprocess a source file
+Perm.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Perm.cpp.i
+.PHONY : Perm.cpp.i
+
+Perm.s: Perm.cpp.s
+
+.PHONY : Perm.s
+
+# target to generate assembly for a file
+Perm.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Perm.cpp.s
+.PHONY : Perm.cpp.s
+
 QueryEditor.o: QueryEditor.cpp.o
 
 .PHONY : QueryEditor.o
@@ -384,6 +411,9 @@ help:
 	@echo "... List.o"
 	@echo "... List.i"
 	@echo "... List.s"
+	@echo "... Perm.o"
+	@echo "... Perm.i"
+	@echo "... Perm.s"
 	@echo "... QueryEditor.o"
 	@echo "... QueryEditor.i"
 	@echo "... QueryEditor.s"
