@@ -177,6 +177,33 @@ Hashtable.cpp.s:
 	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/Hashtable.cpp.s
 .PHONY : Hashtable.cpp.s
 
+JobScheduler.o: JobScheduler.cpp.o
+
+.PHONY : JobScheduler.o
+
+# target to build an object file
+JobScheduler.cpp.o:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/JobScheduler.cpp.o
+.PHONY : JobScheduler.cpp.o
+
+JobScheduler.i: JobScheduler.cpp.i
+
+.PHONY : JobScheduler.i
+
+# target to preprocess a source file
+JobScheduler.cpp.i:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/JobScheduler.cpp.i
+.PHONY : JobScheduler.cpp.i
+
+JobScheduler.s: JobScheduler.cpp.s
+
+.PHONY : JobScheduler.s
+
+# target to generate assembly for a file
+JobScheduler.cpp.s:
+	$(MAKE) -f CMakeFiles/tempproj.dir/build.make CMakeFiles/tempproj.dir/JobScheduler.cpp.s
+.PHONY : JobScheduler.cpp.s
+
 List.o: List.cpp.o
 
 .PHONY : List.o
@@ -408,6 +435,9 @@ help:
 	@echo "... Hashtable.o"
 	@echo "... Hashtable.i"
 	@echo "... Hashtable.s"
+	@echo "... JobScheduler.o"
+	@echo "... JobScheduler.i"
+	@echo "... JobScheduler.s"
 	@echo "... List.o"
 	@echo "... List.i"
 	@echo "... List.s"

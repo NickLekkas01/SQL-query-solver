@@ -96,6 +96,12 @@
 		<Unit filename="/home/athena/CLionProjects/temp/Hashtable.h">
 			<Option target="tempproj"/>
 		</Unit>
+		<Unit filename="/home/athena/CLionProjects/temp/JobScheduler.cpp">
+			<Option target="tempproj"/>
+		</Unit>
+		<Unit filename="/home/athena/CLionProjects/temp/JobScheduler.h">
+			<Option target="tempproj"/>
+		</Unit>
 		<Unit filename="/home/athena/CLionProjects/temp/List.cpp">
 			<Option target="tempproj"/>
 		</Unit>

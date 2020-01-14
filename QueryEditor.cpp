@@ -10,6 +10,10 @@
 #include <set>
 #include "Perm.h"
 #define NoCrossProducts 1
+
+#include "JobScheduler.h"
+
+
 //uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
@@ -111,6 +115,7 @@ void getLists(List1 ** batchdebug, int numbatches, const string &queriesFile){
 
 void JobExecutor(const string &queriesFile, Data *data) {
     ifstream workload(queriesFile);
+
     if(!workload){
         cout << "Couldn't open workload file";
 
@@ -137,21 +142,45 @@ void JobExecutor(const string &queriesFile, Data *data) {
     workload.close();
 
 }
-
+class QueryJob : public Job {
+    int taskid;
+    Data * dataExt;
+    string Query;
+public:
+    QueryJob(int id, Data *dataExt, string Query) : Job(), taskid(id) {
+        this->taskid = id;
+        this->dataExt = dataExt;
+        this->Query = Query;
+    }
+    void run() override {
+        //printf("Hello World from task %d\n", taskid);
+        //call queryexecutor function.
+        QueryExecutor( Query, dataExt);
+    }
+};
+//#define THREADS
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
-
+    #ifdef THREADS
+    JobScheduler scheduler(1);
+    #endif
+    int i =0;
     while (curr!= nullptr){
         //numOfProjections=0;
         cout <<"Now Processing Query: "<<curr->query<<endl;
-        //get2ndpart
-        //todo get 3rd part - projectionsss
-        //execute query
+
+        #ifndef THREADS
         QueryExecutor(curr->query, data);
-
+        #endif
+        #ifdef THREADS
+        scheduler.schedule(new QueryJob(i, data, curr->query));
+        #endif
         curr = curr->next;
-
+        i++;
     }
+    #ifdef THREADS
+    scheduler.waitUntilJobsHaveFinished();
+    #endif
 }
 
 RelationCS **initStats(RelationMD **bindings, int numOfBindings, QueryStats *QStats) {
@@ -317,7 +346,7 @@ void QueryExecutor(string query, Data *dataExt) {
     //deleteIntermediateData(&data);//here
     //return;
     for (int i = 0; i < numOfPredicates; ++i) {
-        cout <<"Now processing Predicate "<< Predicates[i]<<endl;
+        //cout <<"Now processing Predicate "<< Predicates[i]<<endl;
         //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
         short switchValue =typeOfPredicate(Predicates[i]);
         switch(switchValue){

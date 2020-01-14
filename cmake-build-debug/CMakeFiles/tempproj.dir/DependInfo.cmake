@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/athena/CLionProjects/temp/DBRelationsReader.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/DBRelationsReader.cpp.o"
   "/home/athena/CLionProjects/temp/Hashtable.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Hashtable.cpp.o"
+  "/home/athena/CLionProjects/temp/JobScheduler.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/JobScheduler.cpp.o"
   "/home/athena/CLionProjects/temp/List.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/List.cpp.o"
   "/home/athena/CLionProjects/temp/Perm.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/Perm.cpp.o"
   "/home/athena/CLionProjects/temp/QueryEditor.cpp" "/home/athena/CLionProjects/temp/cmake-build-debug/CMakeFiles/tempproj.dir/QueryEditor.cpp.o"

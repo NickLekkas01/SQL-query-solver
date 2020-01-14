@@ -13,9 +13,7 @@ void printTemp(uint64_t *pInt, uint64_t num);
 bool isTrue(uint64_t value1, int op, uint64_t value) {
     switch (op){
         case '=':
-            if(value1 == value){
-                return true;
-            } else{ return false;}
+            return value1 == value;
         case '>':
             if(value1 > value){
                 return true;
