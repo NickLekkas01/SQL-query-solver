@@ -15,7 +15,7 @@ void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
 
-void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections);
+void QueryExecutor(string query, Data *dataExt);
 void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStats *queryStats);
 
 uint64_t maxInt(const uint64_t a, const uint64_t i);
@@ -140,30 +140,17 @@ void JobExecutor(const string &queriesFile, Data *data) {
 
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
-    string QueryParts[QUERYPARTS];
-    RelationMD ** Bindings;
-    string * Predicates;
-    int ** Projections = nullptr;
-    int numOfBindings, numOfPredicates, numOfProjections=0;
+
     while (curr!= nullptr){
         //numOfProjections=0;
         cout <<"Now Processing Query: "<<curr->query<<endl;
-        getParts(curr->query, QueryParts);
-        Bindings = getBindings(QueryParts[0], data, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
         //get2ndpart
-        Predicates = getPredicates(QueryParts[1], &numOfPredicates, Bindings);
         //todo get 3rd part - projectionsss
-        Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
         //execute query
-        QueryExecutor(Bindings, Predicates, Projections, numOfBindings, numOfPredicates, numOfProjections);
+        QueryExecutor(curr->query, data);
 
         curr = curr->next;
-        delete [] Bindings;
-        delete[] Predicates;
-        for(int i = 0; i < numOfProjections; i++)
-            delete[] Projections[i];
-        delete[] Projections;
-        Projections = nullptr;
+
     }
 }
 
@@ -301,24 +288,34 @@ uint64_t maxInt(const uint64_t a, const uint64_t i) {
     return 0;
 }
 
-void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections, int numOfBindings, int numOfPredicates, int numOfProjections) {
+void QueryExecutor(string query, Data *dataExt) {
     // initialize IM results here, send them below.
+    string QueryParts[QUERYPARTS];
+    RelationMD ** Bindings;
+    string * Predicates;
+    int ** Projections = nullptr;
+    int numOfBindings, numOfPredicates, numOfProjections=0;
+    getParts(query, QueryParts);
+    Bindings = getBindings(QueryParts[0], dataExt, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
+    Predicates = getPredicates(QueryParts[1], &numOfPredicates, Bindings);
+    Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
+
 
     IMData data;
     initializeIMData(&data, numOfBindings);
     //initialize query statistics
     QueryStats QStats;
-    RelationCS ** statistics = initStats(Bindings, numOfBindings, &QStats);
+    //RelationCS ** statistics = initStats(Bindings, numOfBindings, &QStats);
 
     int * PParts = nullptr;
     uint64_t * PPartsF = nullptr;
     uint64_t * temp, *R1, *R2;
-    QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
+    //QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
     //delete statistics;
 
-    deleteStats(statistics, numOfBindings, QStats);//here
-    deleteIntermediateData(&data);//here
-    return;
+    //deleteStats(statistics, numOfBindings, QStats);//here
+    //deleteIntermediateData(&data);//here
+    //return;
     for (int i = 0; i < numOfPredicates; ++i) {
         cout <<"Now processing Predicate "<< Predicates[i]<<endl;
         //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
@@ -542,8 +539,13 @@ void QueryExecutor(RelationMD **Bindings, string *Predicates, int **Projections,
     printResults(sumOfProjections, numOfProjections);
     delete[] sumOfProjections;
     deleteIntermediateData(&data);
-    deleteStats(statistics, numOfBindings, QStats);
-
+//    deleteStats(statistics, numOfBindings, QStats);
+    delete [] Bindings;
+    delete[] Predicates;
+    for(int i = 0; i < numOfProjections; i++)
+        delete[] Projections[i];
+    delete[] Projections;
+    Projections = nullptr;
 }
 
 typedef struct opt {
