@@ -4,7 +4,8 @@
 #include <fstream>
 
 typedef struct RelationColumnStats{
-    uint64_t upperA, lowerA,fA ,distinctA;
+    uint64_t upperA=0, lowerA=0,fA =0,distinctA=0;
+    bool changed=false;
 }RelationCS;
 typedef struct QueryStatistics{
     uint8_t numOfBindings;

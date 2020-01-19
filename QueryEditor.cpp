@@ -8,9 +8,10 @@
 #include "QueryEditor.h"
 #include <cmath>
 #include <set>
+#include <utility>
 #include "Perm.h"
 #define NoCrossProducts 1
-
+//#define DEBUG
 #include "JobScheduler.h"
 
 
@@ -22,11 +23,10 @@ using namespace std;
 void QueryExecutor(string query, Data *dataExt);
 void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStats *queryStats);
 
-uint64_t maxInt(const uint64_t a, const uint64_t i);
 
-uint64_t minInt(const uint64_t a, const uint64_t i);
+void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats);
 
-void QueryOptimizer(string *predicates, int bindings, int projections, QueryStats *queryStats);
+uint64_t getCost1(int *predCombo, string *Predicates, int joins, QueryStats statistics, int predicate);
 
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfPleiades = 0;
@@ -77,42 +77,6 @@ void deleteIntermediateData(IMData * imData){
 
 }
 
-void printResults(uint64_t *sumOfProjections, int numOfProjections) {
-    cout << "Results:" << endl;
-    for(int i = 0; i < numOfProjections; i++){
-        cout << "Projection: "<< i <<" Sum: "<<  sumOfProjections[i] << endl;
-    }
-    cout << endl;
-}
-
-void getLists(List1 ** batchdebug, int numbatches, const string &queriesFile){
-    ifstream workload(queriesFile);
-    if(!workload){
-        cout << "Couldn't open workload file";
-
-    }
-    int index = 0;
-    List1 * list = new List1;
-    string query;
-    while (getline(workload, query)){
-        //cout << query<< endl;
-        //if query is F, send batch to process, reset list
-        if(query == "F"){
-            //send batch to process
-            batchdebug[index] = list;
-            list= nullptr;
-            list = new List1;
-            index++;
-            continue;
-        }
-        //add query to list
-        AddToList(list, query);
-        //PrintList(&list);
-
-    }
-    workload.close();
-}
-
 void JobExecutor(const string &queriesFile, Data *data) {
     ifstream workload(queriesFile);
 
@@ -123,12 +87,10 @@ void JobExecutor(const string &queriesFile, Data *data) {
     List1 list;
     string query;
     while (getline(workload, query)){
-        //cout << query<< endl;
         //if query is F, send batch to process, reset list
         if(query == "F"){
             //send batch to process
             batchExecutor(&list, data);
-            //PrintList(&list);
             DeleteList(&list);
             list.start= nullptr;
             list.end = nullptr;
@@ -136,7 +98,6 @@ void JobExecutor(const string &queriesFile, Data *data) {
         }
         //add query to list
         AddToList(&list, query);
-        //PrintList(&list);
 
     }
     workload.close();
@@ -150,15 +111,13 @@ public:
     QueryJob(int id, Data *dataExt, string Query) : Job(), taskid(id) {
         this->taskid = id;
         this->dataExt = dataExt;
-        this->Query = Query;
+        this->Query = std::move(Query);
     }
     void run() override {
-        //printf("Hello World from task %d\n", taskid);
-        //call queryexecutor function.
         QueryExecutor( Query, dataExt);
     }
 };
-//#define THREADS
+//define THREADS
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
     #ifdef THREADS
@@ -183,140 +142,7 @@ void batchExecutor(List1 * batch, Data * data){
     #endif
 }
 
-RelationCS **initStats(RelationMD **bindings, int numOfBindings, QueryStats *QStats) {
-    RelationCS ** rvalue = new RelationCS*[numOfBindings];
-    QStats->TuplesPerBinding = new uint8_t[numOfBindings];
-    for (int i = 0; i < numOfBindings; ++i) {
-        rvalue[i] = new RelationCS[bindings[i]->TuplesNum];
-        QStats->TuplesPerBinding[i] = bindings[i]->TuplesNum;
-        for (int j = 0; j < bindings[i]->TuplesNum; ++j) {
-            rvalue[i][j] = bindings[i]->statistics[j];
-        }
-    }
-    QStats->numOfBindings = numOfBindings;
-    QStats->stats = rvalue;
-    return rvalue;
-} // todo transport to util qe
-
-void deleteStats(RelationCS **stats, int numOfBindings, QueryStats Qstats) {
-    delete [] Qstats.TuplesPerBinding;
-    for (int i = 0; i < numOfBindings; ++i) {
-        delete [] stats[i];
-    }
-    delete [] stats;
-}
-
-void updateStats(QueryStats *statistics, const string& Predicate) {
-    uint64_t lowerA, upperA;
-    uint64_t fA, distinctA;
-    short SwitchValue = typeOfPredicate(Predicate);
-    int  * PParts;
-    uint64_t * PPartsF;
-    switch (SwitchValue){
-        case FILTER:
-            PPartsF = getNumericalValuePredicateParts(Predicate);
-            switch (PPartsF[2]){
-
-                case '=': {
-                    statistics->stats[PPartsF[0]][PPartsF[1]].upperA = statistics->stats[PPartsF[0]]->lowerA = PPartsF[3]; // la = ua = k
-                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
-                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = (statistics->stats[PPartsF[0]]->fA /
-                                                                    statistics->stats[PPartsF[0]]->distinctA);
-                    uint64_t distinctA = statistics->stats[PPartsF[0]][PPartsF[1]].distinctA;
-                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = 1;
-
-
-                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
-                        if (i == PPartsF[1]) {
-                            continue;
-                        }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA * (1 -(pow(1 -
-                                                                                                                        statistics->stats[PPartsF[0]][PPartsF[1]].fA /
-                                                                                                                        fA,
-                                                                                                                        statistics->stats[PPartsF[0]][i].fA /
-                                                                                                                        statistics->stats[PPartsF[0]][i].distinctA)));
-                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
-                    }
-                }
-
-                break;
-                case '>':
-                    lowerA = statistics->stats[PPartsF[0]][PPartsF[1]].lowerA;
-                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
-                    statistics->stats[PPartsF[0]][PPartsF[1]].lowerA = maxInt(statistics->stats[PPartsF[0]][PPartsF[1]].lowerA, PPartsF[3]);
-                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((uint64_t)((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)*statistics->stats[PPartsF[0]][PPartsF[1]].distinctA)/(statistics->stats[PPartsF[0]][PPartsF[1]].upperA-lowerA));
-                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/ (statistics->stats[PPartsF[0]][PPartsF[1]].upperA - lowerA));
-                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
-                        if (i == PPartsF[1]){
-                            continue;
-                        }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[PPartsF[0]][i].fA/statistics->stats[PPartsF[0]][i].distinctA)));
-                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
-                    }
-                    break;
-                case '<':
-                    upperA = statistics->stats[PPartsF[0]][PPartsF[1]].upperA;
-                    fA = statistics->stats[PPartsF[0]][PPartsF[1]].fA;
-                    statistics->stats[PPartsF[0]][PPartsF[1]].upperA = minInt(statistics->stats[PPartsF[0]][PPartsF[1]].upperA, PPartsF[3]);
-                    statistics->stats[PPartsF[0]][PPartsF[1]].distinctA = ((statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA)/(upperA-statistics->stats[PPartsF[0]][PPartsF[1]].lowerA));
-                    statistics->stats[PPartsF[0]][PPartsF[1]].fA = (statistics->stats[PPartsF[0]][PPartsF[1]].upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA/ (upperA - statistics->stats[PPartsF[0]][PPartsF[1]].lowerA));
-                    for (int i = 0; i < statistics->TuplesPerBinding[PPartsF[0]]; ++i) { // foreach column in relation
-                        if (i == PPartsF[1]){
-                            continue;
-                        }
-                        statistics->stats[PPartsF[0]][i].distinctA = statistics->stats[PPartsF[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PPartsF[0]][PPartsF[1]].fA/fA, statistics->stats[PPartsF[0]][i].fA/statistics->stats[PPartsF[0]][i].distinctA)));
-                        statistics->stats[PPartsF[0]][i].fA = statistics->stats[PPartsF[0]][i].fA;
-                    }
-                    break;
-            }
-            delete [] PPartsF;
-            // */
-            break;
-        case JOIN:
-            PParts = getPredicateParts(Predicate);
-            //new lower for both relcolumns in join is max of their two old lower
-            distinctA = statistics->stats[PParts[0]][PParts[1]].distinctA;
-            statistics->stats[PParts[0]][PParts[1]].upperA = statistics->stats[PParts[2]][PParts[3]].upperA = minInt(statistics->stats[PParts[2]][PParts[3]].upperA,statistics->stats[PParts[0]][PParts[1]].upperA);
-
-            //new upper for both relcolumns in join is min of their old two upper
-            statistics->stats[PParts[0]][PParts[1]].lowerA = statistics->stats[PParts[2]][PParts[3]].lowerA = maxInt(statistics->stats[PParts[2]][PParts[3]].lowerA,statistics->stats[PParts[0]][PParts[1]].lowerA);
-            statistics->stats[PParts[0]][PParts[1]].fA = statistics->stats[PParts[2]][PParts[3]].fA = ((statistics->stats[PParts[0]][PParts[1]].fA * statistics->stats[PParts[2]][PParts[3]].fA )/(statistics->stats[PParts[0]][PParts[1]].upperA - statistics->stats[PParts[0]][PParts[1]].lowerA +1));
-            statistics->stats[PParts[0]][PParts[1]].distinctA = statistics->stats[PParts[2]][PParts[3]].distinctA = ((statistics->stats[PParts[0]][PParts[1]].distinctA * statistics->stats[PParts[2]][PParts[3]].distinctA )/(statistics->stats[PParts[0]][PParts[1]].upperA - statistics->stats[PParts[0]][PParts[1]].lowerA+1));
-
-            //for rest of columns in both
-            for (int i = 0; i < statistics->TuplesPerBinding[PParts[0]]; ++i) { // foreach column in relation
-                if (i == PParts[1]){
-                    continue;
-                }
-                statistics->stats[PParts[0]][i].distinctA = statistics->stats[PParts[0]][i].distinctA*(1 - ( pow(1 -statistics->stats[PParts[0]][PParts[1]].distinctA/distinctA, statistics->stats[PParts[0]][i].fA/statistics->stats[PParts[0]][i].distinctA)));
-                statistics->stats[PParts[0]][i].fA = statistics->stats[PParts[0]][PParts[1]].fA;
-            }
-            distinctA = statistics->stats[PParts[2]][PParts[3]].distinctA;
-
-            //new upper for both relcolumns in join is min of their old two upper
-
-            //for rest of columns in both
-            for (int i = 0; i < statistics->TuplesPerBinding[PParts[2]]; ++i) { // foreach column in relation
-                if (i == PParts[3]){
-                    continue;
-                }
-                statistics->stats[PParts[2]][i].distinctA = statistics->stats[PParts[2]][i].distinctA*(1 - ( pow(1 -statistics->stats[PParts[2]][PParts[3]].distinctA/distinctA, statistics->stats[PParts[2]][i].fA/statistics->stats[PParts[2]][i].distinctA)));
-                statistics->stats[PParts[2]][i].fA = statistics->stats[PParts[2]][PParts[3]].fA;
-            }
-            delete [] PParts;
-            break;
-    }
-}
-
-uint64_t minInt(const uint64_t a, const uint64_t i) {
-    return ((a<i)? a: i);
-}
-
-uint64_t maxInt(const uint64_t a, const uint64_t i) {
-    return ((a>i)? a: i);
-    return 0;
-}
-
+//#define DEBUG
 void QueryExecutor(string query, Data *dataExt) {
     // initialize IM results here, send them below.
     string QueryParts[QUERYPARTS];
@@ -324,41 +150,46 @@ void QueryExecutor(string query, Data *dataExt) {
     string * Predicates;
     int ** Projections = nullptr;
     int numOfBindings, numOfPredicates, numOfProjections=0;
-    getParts(query, QueryParts);
+    getParts(move(query), QueryParts);
     Bindings = getBindings(QueryParts[0], dataExt, &numOfBindings); //mia delete xrwstoumenh ana epanalhpsh- delete = clear for next (gia na mh fainontai ta allov del sto loop
     Predicates = getPredicates(QueryParts[1], &numOfPredicates, Bindings);
     Projections = getProjections(QueryParts[2], Projections, numOfBindings, &numOfProjections);
-
 
     IMData data;
     initializeIMData(&data, numOfBindings);
     //initialize query statistics
     QueryStats QStats;
-    //RelationCS ** statistics = initStats(Bindings, numOfBindings, &QStats);
+    RelationCS ** statistics = initStats(Bindings, numOfBindings, &QStats);
 
     int * PParts = nullptr;
-    uint64_t * PPartsF = nullptr;
-    uint64_t * temp, *R1, *R2;
-    //QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
-    //delete statistics;
 
-    //deleteStats(statistics, numOfBindings, QStats);//here
-    //deleteIntermediateData(&data);//here
-    //return;
+    //QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
+
+
+
+#ifdef DEBUG
+    deleteStats(statistics, numOfBindings, QStats);
+    deleteIntermediateData(&data);
+    delete [] Predicates;
+    delete [] Bindings;
+    for(int i = 0; i < numOfProjections; i++)
+        delete[] Projections[i];
+    delete[] Projections;
+    return;
+#endif
     for (int i = 0; i < numOfPredicates; ++i) {
-        //cout <<"Now processing Predicate "<< Predicates[i]<<endl;
+        cout <<"Now processing Predicate "<< Predicates[i]<<endl;
         //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
         short switchValue =typeOfPredicate(Predicates[i]);
         switch(switchValue){
+            default:
+                cout <<"Invalid Predicate\n";
+                break;
             case 1: //we have a column value compare to number
                 //get binded value(pointer to relation) , column value and operator, execute query
 
-                temp = ExecuteNumericalValueQuery(Predicates[i], Bindings, numOfBindings,&data);
-                //PPartsF = getNumericalValuePredicateParts(Predicates[i]);
-                //updateStats(&QStats, switchValue, PPartsF, data, temp[1]);
+                ExecuteNumericalValueQuery(Predicates[i], Bindings, numOfBindings,&data);
 
-                //delete [] PPartsF;
-                //add to im results
                 break;
             case 2:
                 //0->binded R1 1-> r1 column || 2->binded r2 3->binded r3
@@ -487,60 +318,24 @@ void QueryExecutor(string query, Data *dataExt) {
 //                delete[] R1;
 //                delete[] R2;
                 break;
+
         }
     }
 
 
-//    for(int i = 0; i < data.numOfBindings; i++)
-//    {
-//        if(!data.visitedJoint[i] && data.visited[i])
-//        {
-//            int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
-//            int newNumOfColsInTuple = numOfColsInTuple + 1;
-//            uint64_t *Results = new uint64_t[data.numOfPleiades * (data.IMResColumnsForFilters[i][1]) * newNumOfColsInTuple];
-//            uint64_t *temp = new uint64_t[newNumOfColsInTuple];
-//            data.visitedJoint[i] = true;
-//            data.Map[numOfColsInTuple] = i;
-//            uint64_t pleiades_new = 0;
-//            for (uint64_t j = 0; j < data.IMResColumnsForFilters[i][1]; j++)
-//            {
-//                for(uint64_t k = 0; k < data.numOfPleiades; k++)
-//                {
-//                    putInBuffer(temp, k * newNumOfColsInTuple, data.IMResColumnsForJoin,
-//                                getPleiada(data.visitedJoint, data.numOfBindings));
-//                    putInImResults(temp, Results, pleiades_new * newNumOfColsInTuple,
-//                                   getPleiada(data.visitedJoint, data.numOfBindings));
-//                    pleiades_new++;
-//                }
-//            }
-//            delete[] temp;
-//            data.numOfPleiades = pleiades_new;
-//            delete[] data.IMResColumnsForJoin;
-//            data.IMResColumnsForJoin = Results;
-//        }
-//    }
-
-    /*Create Results from Projections */
-//    uint64_t **ProjectionResults = new uint64_t*[numOfProjections];
     uint64_t *sumOfProjections = new uint64_t[numOfProjections];
     uint64_t size = data.numOfPleiades;
-//    for (int j = 0; j < numOfProjections; ++j) {
-//        if (data.visited[j] && data.IMResColumnsForFilters[j][1] > size)
-//            size = data.IMResColumnsForFilters[j][1];
-//    }
+
     for (int j = 0; j < numOfProjections; ++j) {
         sumOfProjections[j] = 0;
         int columnInTuple = getFromMap(data.Map, data.numOfBindings, Projections[j][0]);
         uint64_t indexInBinding;
-//        ProjectionResults[j] = new uint64_t[size];
         if(data.visitedJoint[Projections[j][0]]){
             int numOfColsInTuple = getPleiada(data.visitedJoint, data.numOfBindings);
             for(uint64_t k = 0; k < data.numOfPleiades; ++k) {
                 indexInBinding = (data.IMResColumnsForJoin[k*numOfColsInTuple + columnInTuple]);
                 uint64_t numberOfTuples = (Bindings[Projections[j][0]]->RowsNum);
                 int columnForProjection = Projections[j][1];
-//                ProjectionResults[j][k] = Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
-//                sumOfProjections[j] += ProjectionResults[j][k];
                 sumOfProjections[j] += Bindings[Projections[j][0]]->RelationSerialData[(numberOfTuples*columnForProjection) + indexInBinding];
             }
         }
@@ -548,7 +343,7 @@ void QueryExecutor(string query, Data *dataExt) {
             int numOfColsInTuple = getPleiada(data.visited, data.numOfBindings);
             int position;
             for (int i = 0; i < numOfBindings; i++){
-                if (data.IMResColumnsForFilters[i] == NULL) continue;
+                if (data.IMResColumnsForFilters[i] == nullptr) continue;
                 if ((data.IMResColumnsForFilters[i][0]) == Projections[j][0]) {
                     position = i;
                     break;
@@ -568,7 +363,7 @@ void QueryExecutor(string query, Data *dataExt) {
     printResults(sumOfProjections, numOfProjections);
     delete[] sumOfProjections;
     deleteIntermediateData(&data);
-//    deleteStats(statistics, numOfBindings, QStats);
+    deleteStats(statistics, numOfBindings, QStats);
     delete [] Bindings;
     delete[] Predicates;
     for(int i = 0; i < numOfProjections; i++)
@@ -623,6 +418,7 @@ bool **initAdjacencyMatrix(int bindings, string *Predicates, int predNum) {
         temp = getPredicateParts(Predicates[k]);
         if(temp[0] == temp[2]){delete []temp;continue;}
         rvalue[temp[0]][temp[2]] = true;
+        rvalue[temp[2]][temp[0]] = true;
         delete [] temp;
     }
     return rvalue;
@@ -644,7 +440,7 @@ void deleteAdjacency(bool **pBoolean, int bindings) {
 }
 
 bool connected(int R, bool **adjacency, const set<int>& set1, int bindings) {
-    set <int>::iterator it = set1.begin();
+    auto it = set1.begin();
 
     while (it!= set1.end()){
         if(adjacency[*it][R])return true;
@@ -656,7 +452,7 @@ bool connected(int R, bool **adjacency, const set<int>& set1, int bindings) {
 int * GetBestTree(const set<int> &set1, HashTable *BestTree, int iterator) {
     auto it = set1.begin();
     for (int i = 0; i < iterator; ++i) {
-        if (BestTree[i].S == set1){
+        if (BestTree[i].S == set1 || BestTree[i].S.empty()){
             return BestTree[i].tree;
             cout<<"";
         }
@@ -668,24 +464,73 @@ int cost(int *pInt, string *predicates, int numOfPred, int treeIter, QueryStats 
     return 0;
 }
 
+uint64_t getCost(const int *tree, int treeLength, string *predicates, int predicatesNum, int i, QueryStats pStatistics) {
+    uint64_t cost = 0;
+    int * curr;
+
+    for (int j = 0; j < treeLength; ++j) {
+        for (int k = i; k < predicatesNum; ++k) {
+
+            curr = getPredicateParts(predicates[k]);
+
+            if((tree[j] == curr[0] || tree[j] == curr[2]) &&(tree[j+1] == curr[0] ||tree[j+1] == curr[2])){
+                //found one couple, update stat! heh
+                //cout << "Now updating stats of Predicate"<<predicates[k]<<endl;
+                updateStats(&pStatistics, predicates[k]);
+            }
+
+            delete[] curr;
+        }
+    }
+    //pStatistics.stats[0]->upperA=0;
+    return pStatistics.stats[tree[treeLength-1]][0].fA;
+}
+
+void
+updateHashTable(HashTable *BestTree, int *newTree, int iterator, const set<int> &set, string *Predicates, int start,
+                int predNum, QueryStats querystats, int treeLength) {
+    for (int i = 0; i < iterator; ++i) {
+        if(BestTree[i].S == set || BestTree[i].S.empty()){
+            delete [] BestTree[i].tree;
+            BestTree[i].tree = newTree;
+
+            if(BestTree[i].S.empty())BestTree[i].S = set;
+            BestTree[i].cost = getCost(newTree,treeLength,Predicates,predNum,start,querystats);
+            return;
+        }
+    }
+}
+
+void printArray(int *pInt, int l) {
+    for (int i = 0; i < l; ++i) {
+        cout <<pInt[i]<<" ";
+    }
+    cout << endl;
+}
+
+void printSet(const set<int>& myset) {
+    for (int it : myset)
+        cout << it<<' ';
+    cout <<endl;
+}
+
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
-    HashTable * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
+    auto * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
+    int comboIterator = (int)(pow(2, bindings) - 1);
     int * relationSet = new int [bindings];
     initSet(relationSet, bindings);
-
+    int k;
     bool ** adjacencyMatrix = initAdjacencyMatrix(bindings, Predicates, predicates);
-
     int ** setIterator = nullptr;
     for (int j = 0; j < pow(2, bindings) - 1; ++j) {
         BestTree[j].cost = 0;
         BestTree[j].tree = nullptr;
+        BestTree[j].S = {};
     }
     //init for filters - questions
-    for (int k = 0; k < predicates; ++k) {
-        if(typeOfPredicate(Predicates[k]) != 1)continue;
-        //temp = getNumericalValuePredicateParts(Predicates[k]);
-        //updateStats(queryStats, Predicates[k]);
-        //delete [] temp;
+    for ( k = 0; k < predicates; ++k) {
+        if(typeOfPredicate(Predicates[k]) != 1)break;
+        updateStats(queryStats, Predicates[k]);
     }
     //apo k mexri telos exei join pou 8a melethsoume
     for (int i = 0; i < bindings; ++i) {
@@ -697,27 +542,75 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     int temp;
 
     for (int l = 1; l <= bindings; ++l) {
+
         //get all subsets of
         setIterator = new int*[combinationFormula(bindings, l)];
         printCombination(relationSet, bindings, l, setIterator);
-        cout <<endl;
+        //cout <<endl;
+        int *newTreeArray = nullptr, *newTreeDebug;
+        uint64_t newCostDebug;
         for (int i = 0; i < combinationFormula(bindings, l); ++i) {
 
             currSet = setIterator[i];
-
+            #ifdef DEBUG
+            cout<<"current Set:\n";
+            printArray(currSet, l);
+            #endif
             for (int j = 0; j < bindings; ++j) {
+                #ifdef DEBUG
+                cout << "is " << j <<" in current set?\n\n";
+
+                #endif
                 set <int> setter(currSet, currSet + l);
+                //newTreeArray = new int[l+1];
+
                 if(inCurrSet(j, currSet, l)){
+#ifdef DEBUG
+                    cout << "yes " << j <<" is in current set\n\n";
+#endif
                     continue;
                 }
-                if(!connected(j, adjacencyMatrix, setter, bindings && NoCrossProducts)){
+                if(!connected(j, adjacencyMatrix, setter, bindings)){
                     continue;
                 }
+
                 set<int> St(setter);
                 St.insert(j);
-                int * currTree = GetBestTree(St, BestTree, (int)(pow(2, bindings) - 1));
-                if(cost(GetBestTree(St, BestTree, (int) (pow(2, bindings) - 1)), Predicates, predicates, 0, queryStats) > cost(currTree, nullptr, 0, 0,nullptr) || currTree == nullptr ){}
-                //if BestTree(St) == NULL || costBestTree(St) > cost(CurrTree) replace
+                //copy currtree to newTree
+                int * currTree = GetBestTree(setter, BestTree, comboIterator);
+                if(currTree == nullptr)continue;
+                newTreeArray = new int [l+1];
+                for (int m = 0; m < l; ++m) {
+                    newTreeArray[m] = currTree[m];
+                }
+
+                newTreeArray[l] = j;
+#ifdef DEBUG
+                cout<<"previous tree Set:\n";
+                printSet(setter);
+                cout<<"current tree Array:\n";
+                printArray(newTreeArray, l+1);
+
+#endif
+                newTreeDebug =GetBestTree(St, BestTree, comboIterator);
+#ifdef DEBUG
+                cout << "Set St:";
+                printSet(St);
+                cout<<"Get Best tree result for Set St:\n";
+                printArray(currTree, l);
+#endif
+                //newCostDebug = getCost(newTreeDebug, l, Predicates, predicates, k, *queryStats);
+                if( newTreeDebug == nullptr || (getCost(newTreeDebug, l, Predicates, predicates,k , *queryStats)
+                  > getCost(newTreeArray, l, Predicates, predicates,k , *queryStats))){
+                    updateHashTable(BestTree, newTreeArray, comboIterator, St, Predicates, k, predicates, *(queryStats),
+                                    l);
+
+                }
+                else{
+                    delete [] newTreeArray;
+                    newTreeArray = nullptr;
+                }
+                //if (GetBestTree(St, BestTree) == NULL || costBestTree(St) > cost(CurrTree) replace
 
             }
         }
@@ -727,6 +620,8 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
         }
         delete [] setIterator;
     }
+    set <int> finalSet(relationSet, relationSet + bindings);
+    int * finalTree = GetBestTree(finalSet,BestTree,comboIterator);
     deleteAdjacency(adjacencyMatrix, bindings);
     for (int m = 0; m < (int) (pow(2, bindings) - 1); ++m) {
         delete [] BestTree[m].tree;
@@ -756,10 +651,9 @@ void CombinationRepetitionUtil(int chosen[], int arr[],
         CombinationRepetitionUtil(chosen, arr, index + 1,
                                   r, i, end);
     }
-    return;
 }
 bool isNotSCE(string basicString) {
-    int* temp = getPredicateParts(basicString);
+    int* temp = getPredicateParts(std::move(basicString));
     bool rvalue = (temp[0] != temp[2]);
     delete[]temp;
     return rvalue;
@@ -781,6 +675,7 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
         if(typeOfPredicate(Predicates[i])!=FILTER && isNotSCE(Predicates[i])){
             break;
         }
+        updateStats(queryStats, Predicates[i]);
     }
     int numOfJoins = bindings - i, ** setIterator = nullptr;
     int * setArray = new int[numOfJoins];
@@ -790,25 +685,38 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
     setIterator = new int*[permutationFormula(numOfJoins)];
 
     permutationCaller(setArray, 0, numOfJoins - 1, setIterator);
-    uint64_t cost = -1, newCost=0;
-    int pos;
+    uint64_t cost = -1, newCost=0, temp;
+    int pos=0;
     for (int k = 0; k < permutationFormula(numOfJoins); ++k) {
         //copystats
-        for (int j = 0; j < numOfJoins; ++j) {
-            cout << Predicates[setIterator[k][j]]<<" ";
-            //get cost of this series of predicates
-            if(newCost<cost){
-                cost = newCost;
-                pos = k;
-            }
-        }
+        temp = getCost1(setIterator[k], Predicates, numOfJoins ,*queryStats, predicates);
+        if(cost > temp){cost = temp;pos = k;}
         cout <<endl;
     }
+
+    cout << "Best pred seq:";
+    string tempString, *tempStringArray = new string[numOfJoins];
+    printArray(setIterator[pos], numOfJoins);
+    for (int m = 0; m < numOfJoins; ++m) {
+        tempStringArray[m] = Predicates[setIterator[pos][m]];
+    }
+    for (int m = 0; m < numOfJoins; ++m) {
+        Predicates[i+m] = tempStringArray[m];
+    }
+
+    delete [] tempStringArray;
     for (int j = 0; j < permutationFormula(numOfJoins); ++j) {
         delete [] setIterator[j];
     }
     delete [] setArray;
     delete [] setIterator;
+}
+
+uint64_t getCost1(int *predCombo, string *Predicates, int joins, QueryStats statistics, int predicate) {
+    for (int i = 0; i < joins; ++i) {
+        updateStats(&statistics, Predicates[predCombo[i]]);
+    }
+    return statistics.stats[predCombo[joins-1]][0].fA;
 }
 
 

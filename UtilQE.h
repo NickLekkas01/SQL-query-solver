@@ -58,6 +58,9 @@ int getFromMap(uint64_t *map, uint64_t bindings, uint64_t RelId);
 void copyToBuffer(uint64_t *buffer, uint64_t *Intermediate, uint64_t Row, int numOfCols, int newNumOfCols,
                   uint64_t LastOfBuffer);
 void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uint64_t *buffer, int index);
+RelationCS **initStats(RelationMD **bindings, int numOfBindings, QueryStats *QStats); // todo transport to util qe
+void deleteStats(RelationCS **stats, int numOfBindings, QueryStats Qstats);
+void updateStats(QueryStats *statistics, const std::string& Predicate);
 
 void putInBuffer(uint64_t *buffer, uint64_t index, uint64_t *ImRes, int iterationIndex);
 
