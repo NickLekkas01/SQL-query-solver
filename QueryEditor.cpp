@@ -166,7 +166,7 @@ void QueryExecutor(string query, Data *dataExt) {
     QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
     deleteStats(statistics, numOfBindings, QStats);
     //siudhsiuada
-    
+
 
 #ifdef DEBUG
 //    deleteStats(statistics, numOfBindings, QStats);
