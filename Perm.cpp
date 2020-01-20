@@ -11,12 +11,12 @@ void printarray(int arr[], int size, int **setIter, int *outerIndex)
 
     for(i=0; i<size; i++)
     {
-        printf("%d\t",arr[i]);
+        //printf("%d\t",arr[i]);
         setIter[*outerIndex][i] = arr[i];
 
     }
     (*outerIndex) =  (*outerIndex)+1;
-    printf("\n");
+    //printf("\n");
 }
 
 //function to swap the variables

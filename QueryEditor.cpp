@@ -26,7 +26,7 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
 
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats);
 
-uint64_t getCost1(int *predCombo, string *Predicates, int joins, QueryStats statistics, int predicate);
+uint64_t getCost1(const int *predCombo, string *Predicates, int joins, QueryStats statistics);
 
 void initializeIMData(IMData * imData, int numOfBindings){
     imData->numOfPleiades = 0;
@@ -163,12 +163,13 @@ void QueryExecutor(string query, Data *dataExt) {
 
     int * PParts = nullptr;
 
-    //QueryOptimizer1(Predicates, numOfBindings, numOfPredicates, &QStats);
-
-
+    QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
+    deleteStats(statistics, numOfBindings, QStats);
+    //siudhsiuada
+    
 
 #ifdef DEBUG
-    deleteStats(statistics, numOfBindings, QStats);
+//    deleteStats(statistics, numOfBindings, QStats);
     deleteIntermediateData(&data);
     delete [] Predicates;
     delete [] Bindings;
@@ -194,8 +195,6 @@ void QueryExecutor(string query, Data *dataExt) {
             case 2:
                 //0->binded R1 1-> r1 column || 2->binded r2 3->binded r3
                 PParts = getPredicateParts(Predicates[i]);
-                //break apart predicate, if is same r exception
-//                if(Bindings[PParts[0]] == Bindings[PParts[2]]){
                 if(PParts[0] == PParts[2]){
                     HandleSameColumnException(PParts, Bindings[PParts[0]], &data);
                     delete[] PParts;
@@ -229,10 +228,7 @@ void QueryExecutor(string query, Data *dataExt) {
                     rel1->num_tuples = Bindings[PParts[0]]->RowsNum;
                     rel1->tuples = new Tuple[rel1->num_tuples];
                     getDataFromBindings(Bindings[PParts[0]],PParts[1], rel1);
-//                    for (int j = 0; j < rel1->num_tuples; ++j) {
-//                        bindcheck1 << rel1->tuples[j].key<< " " << rel1->tuples[j].payload << endl;
-//                    }
-                    //get data from bindings
+
                 }
                 if (data.visitedJoint[PParts[2]]){
 
@@ -249,44 +245,13 @@ void QueryExecutor(string query, Data *dataExt) {
                     rel2->num_tuples = Bindings[PParts[2]]->RowsNum;
                     rel2->tuples = new Tuple[rel2->num_tuples];
                     getDataFromBindings(Bindings[PParts[2]],PParts[3], rel2);
-//                    for (int j = 0; j < rel2->num_tuples; ++j) {
-//                        bindcheck2 << rel2->tuples[j].key<< " " << rel2->tuples[j].payload << endl;
-//                    }
+//
                 }
-                //ofstream r1txt ("R1.txt");
-                //ofstream r2txt ("R2.txt");
-//                for (uint64_t  l = 0; l < rel1->num_tuples; ++l) {
-//                    r1txt<<rel1->tuples->key;
-//                    r1txt<<rel1->tuples->payload;
-//                }
-//                for (uint64_t  l = 0; l < rel2->num_tuples; ++l) {
-//                    r2txt<<rel2->tuples->key;
-//                    r2txt<<rel2->tuples->payload;
-//                }
-//                r1txt.close();
-//                r2txt.close();
-                //ofstream checker("Checker.txt");
                 Result *result = SortMergeJoin(rel1, rel2);
                 List *temp = result->startOfList;
-                while(temp!= NULL) {
-//                    for(uint64_t w =0; w < temp->index; w++){
-//                        checker<<temp->rowIDR[w]<<" ";
-//                        checker<<temp->rowIDS[w];
-//                        checker << endl;
-//                    }
-                    temp = temp->next;
-                }
-                //checker.close();
-//                uint64_t numberOfTuples = ListToTable(result->startOfList, &R1, &R2);
-//                R1[0] = (uint64_t )PParts[0];
-//                R2[0] = (uint64_t )PParts[2];
-//
-//                for (int j = 1; j < numberOfTuples; ++j) {
-//                    checker << R1[j] + 1 << " " << R2[j] + 1<<endl;
-//                }
+
                 uint64_t numberOfTuples = 0;
-                temp = result->startOfList;
-                while(temp!= NULL) {
+                while(temp!= nullptr) {
                     numberOfTuples += temp->index;
                     temp = temp->next;
                 }
@@ -315,8 +280,6 @@ void QueryExecutor(string query, Data *dataExt) {
                 delete[] rel2->tuples;
                 delete rel1;
                 delete rel2;
-//                delete[] R1;
-//                delete[] R2;
                 break;
 
         }
@@ -363,7 +326,6 @@ void QueryExecutor(string query, Data *dataExt) {
     printResults(sumOfProjections, numOfProjections);
     delete[] sumOfProjections;
     deleteIntermediateData(&data);
-    deleteStats(statistics, numOfBindings, QStats);
     delete [] Bindings;
     delete[] Predicates;
     for(int i = 0; i < numOfProjections; i++)
@@ -514,6 +476,13 @@ void printSet(const set<int>& myset) {
     cout <<endl;
 }
 
+bool PredNotIncluded(string predicate, string *predicates, int bound) {
+    for (int i = 0; i < bound; ++i) {
+        if(predicate == predicates[i])return false;
+    }
+    return true;
+}
+
 void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats *queryStats) {
     auto * BestTree = new HashTable [(int)(pow(2, bindings) - 1)];
     int comboIterator = (int)(pow(2, bindings) - 1);
@@ -620,8 +589,44 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
         }
         delete [] setIterator;
     }
-    set <int> finalSet(relationSet, relationSet + bindings);
+    set <int> finalSet(relationSet, relationSet + bindings), done = {};
+    int * tempPred, pos = 0;
     int * finalTree = GetBestTree(finalSet,BestTree,comboIterator);
+    //getFinalSequence(Predicates, predicates - k, )
+    string * tempPredStr = new string[predicates - k];
+
+
+    for (int n = 0; n < bindings ; ++n) {
+        //find predicate
+        done.insert(finalTree[n]);
+        //for all elements in set, find predicate that connects them to next relation
+
+
+        auto it = done.begin();
+
+        for (int i = k; i < predicates; ++i) {
+            tempPred = getPredicateParts(Predicates[i]);
+            if((done.find(tempPred[0])!=done.end() && finalTree[n] == tempPred[2]) || ((done.find(tempPred[2])!=done.end() && finalTree[n] == tempPred[0]) && PredNotIncluded(Predicates[i], tempPredStr, bindings-k))){
+                tempPredStr[pos] = Predicates[i];
+                pos++;
+            }
+
+            delete[] tempPred;
+
+        }
+        //while (it!= done.end()){
+
+        //it++;
+        //}
+    }
+
+    for (int i1 = k; i1 < predicates; ++i1) {
+        Predicates[i1] = tempPredStr[i1 -k];
+    }
+
+    delete [] tempPredStr;
+
+    printArray(finalTree, bindings);
     deleteAdjacency(adjacencyMatrix, bindings);
     for (int m = 0; m < (int) (pow(2, bindings) - 1); ++m) {
         delete [] BestTree[m].tree;
@@ -661,10 +666,9 @@ bool isNotSCE(string basicString) {
 
 void CombinationRepetition(int arr[], int n, int r)
 {
-    // Allocate memory
+
     int chosen[r+1];
 
-    // Call the recursice function
     CombinationRepetitionUtil(chosen, arr, 0, r, 0, n-1);
 }
 
@@ -688,15 +692,16 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
     uint64_t cost = -1, newCost=0, temp;
     int pos=0;
     for (int k = 0; k < permutationFormula(numOfJoins); ++k) {
-        //copystats
-        temp = getCost1(setIterator[k], Predicates, numOfJoins ,*queryStats, predicates);
+        temp = getCost1(setIterator[k], Predicates, numOfJoins, *queryStats);
         if(cost > temp){cost = temp;pos = k;}
-        cout <<endl;
     }
 
     cout << "Best pred seq:";
     string tempString, *tempStringArray = new string[numOfJoins];
     printArray(setIterator[pos], numOfJoins);
+
+
+
     for (int m = 0; m < numOfJoins; ++m) {
         tempStringArray[m] = Predicates[setIterator[pos][m]];
     }
@@ -712,7 +717,7 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
     delete [] setIterator;
 }
 
-uint64_t getCost1(int *predCombo, string *Predicates, int joins, QueryStats statistics, int predicate) {
+uint64_t getCost1(const int *predCombo, string *Predicates, int joins, QueryStats statistics) {
     for (int i = 0; i < joins; ++i) {
         updateStats(&statistics, Predicates[predCombo[i]]);
     }
