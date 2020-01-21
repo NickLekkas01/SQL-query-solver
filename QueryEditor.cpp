@@ -99,25 +99,23 @@ void JobExecutor(const string &queriesFile, Data *data) {
     workload.close();
 
 }
-//class QueryJob : public Job {
-//    int taskid;
-//    Data * dataExt;
-//    string Query;
-//public:
-//    QueryJob(int id, Data *dataExt, string Query) : Job(), taskid(id) {
-//        this->taskid = id;
-//        this->dataExt = dataExt;
-//        this->Query = std::move(Query);
-//    }
-//    void run() override {
-//        QueryExecutor( Query, dataExt);
-//    }
-//};
-//define THREADS
+class QueryJob : public Job {
+    Data * dataExt;
+    string Query;
+public:
+    QueryJob( Data *dataExt, string Query) : Job() {
+        this->dataExt = dataExt;
+        this->Query = std::move(Query);
+    }
+    int run() override {
+        QueryExecutor( Query, dataExt);
+    }
+};
+#define THREADS
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
     #ifdef THREADS
-    JobScheduler scheduler(1);
+    JobScheduler scheduler(6);
     #endif
     int i =0;
     while (curr!= nullptr){
@@ -128,13 +126,13 @@ void batchExecutor(List1 * batch, Data * data){
         QueryExecutor(curr->query, data);
         #endif
         #ifdef THREADS
-        scheduler.schedule(new QueryJob(i, data, curr->query));
+        scheduler.schedule(new QueryJob(data, curr->query));
         #endif
         curr = curr->next;
         i++;
     }
     #ifdef THREADS
-    scheduler.waitUntilJobsHaveFinished();
+    scheduler.waitUntilAllJobsHaveFinished();
     #endif
 }
 

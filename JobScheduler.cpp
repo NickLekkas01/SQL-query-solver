@@ -15,7 +15,6 @@ void JobScheduler::initTI(thread_Info *pInfo, queue<Job *> *pQueue, pthread_mute
 
 
 JobScheduler::JobScheduler(uint8_t threadNumO) {
-    threadInfo = nullptr;
     threadNum = threadNumO;
     currJobsRunning = 0;
     done = false;
@@ -30,6 +29,7 @@ JobScheduler::JobScheduler(uint8_t threadNumO) {
         cout<< "pthread_cond_init failed\n";
     }
 
+    threadInfo = new ThreadInfo;
     initTI(threadInfo, &jobQueue, &queueMutex,&isNotEmpty,&currJobsRunning, &done, &jobsHaveFinished);
     threads = new pthread_t[threadNum];
     for (int i = 0; i < threadNum; i++) {

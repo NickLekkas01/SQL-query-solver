@@ -15,7 +15,7 @@
 class Job {
 public:
     virtual ~Job() = default;
-    virtual bool run() = 0;
+    virtual int run() = 0;
 };
 typedef struct thread_Info {
     std::queue <Job *> *jobQueue;
