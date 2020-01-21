@@ -6,11 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/home/athena/CLionProjects/temp/Perm.cpp
-Perm.h
-/home/athena/CLionProjects/temp/Perm.h
+/home/athena/CLionProjects/temp/JobScheduler.cpp
+iostream
+-
+JobScheduler.h
+/home/athena/CLionProjects/temp/JobScheduler.h
 
-/home/athena/CLionProjects/temp/Perm.h
+/home/athena/CLionProjects/temp/JobScheduler.h
+queue
+-
+pthread.h
+-
+cstdlib
+-
+queue
+-
+cstdlib
+-
 iostream
 -
 
