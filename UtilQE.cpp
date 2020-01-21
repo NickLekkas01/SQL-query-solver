@@ -19,6 +19,9 @@ uint64_t minInt(uint64_t a, uint64_t i);
 
 bool isTrue(uint64_t value1, int op, uint64_t value) {
     switch (op){
+        default:
+            std::cout <<"Invalid filter\n";
+            break;
         case '=':
             return value1 == value;
         case '>':
@@ -103,7 +106,6 @@ int getNumOfPredicates(string predicates) {
             iSpaces++;
 
     return iSpaces + 1;
-    //return 0;
 }
 short typeOfPredicate(const string& Predicate) {
     short iSpaces = 0;
@@ -124,15 +126,12 @@ std::string *getPredicates(std::string predicates, int *predicatesNum, RelationM
     string token;
     while ((pos = predicates.find(delimiter)) != std::string::npos) {
         token = predicates.substr(0, pos);
-        //std::cout << token << std::endl;
         temp[index] = token; //todo change
         predicates.erase(0, pos + delimiter.length());
-        //printDefinedStruct(&data->relationsData[stoi(token)]);
 
         index++;
     }
     temp[numOfPredicates - 1] = predicates;
-    //printStrings(temp, numOfPredicates);
 
     string * temp2 = new string[numOfPredicates];
     index = 0;
@@ -168,7 +167,6 @@ std::string *getPredicates(std::string predicates, int *predicatesNum, RelationM
     delete[] visited;
     delete[] temp;
     return temp2;
-    //return nullptr;
 }
 
 int **getProjections(string projections, int **Projections, int numOfBindings, int *numOfProjections)
@@ -213,7 +211,6 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
 
             for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum ; ++i) {
                 if(CorrespondingBinding[i] == PredicateParts[3]){
-//                    cout << "query is satisfied!\n";
                     temp[resultsNum] = RowId;
                     resultsNum ++;
                 }
@@ -223,7 +220,6 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
         case '>':
             for (uint64_t i = PredicateParts[1]*RowsNum; i < (PredicateParts[1]+1)*RowsNum ; ++i) {
                 if(CorrespondingBinding[i] > PredicateParts[3]){
-//                    cout << CorrespondingBinding[i]<<" query is satisfied!\n";
                     temp[resultsNum] = RowId;
                     resultsNum ++;
                 }
@@ -250,16 +246,13 @@ uint64_t * getResults(uint64_t *CorrespondingBinding, int RowsNum ,const int Pre
         rvalue[i+2] = temp[i];
         //copy values to returv value array
     }
-//    cout << resultsNum <<" resnum \n";
 
     delete [] temp;
-    //return value array
     return rvalue;
 }
 
 uint64_t * getNumericalValuePredicateParts(string Predicate) {
     uint64_t * rvalue = new uint64_t[4];
-    //int rvalue[4];
     size_t pos = 0;
     string token;
     pos = Predicate.find('.');
@@ -279,8 +272,6 @@ uint64_t * getNumericalValuePredicateParts(string Predicate) {
     rvalue[2] = Predicate[0];
     Predicate.erase(0, 1 );
     rvalue[3] = stoi(Predicate);
-
-
 
     return rvalue;
 }
@@ -316,18 +307,15 @@ uint64_t *ExecuteNumericalValueQuery(string Predicate, RelationMD **Bindings, in
     Predicate.erase(0, pos + 1);
 
     if((pos = Predicate.find('=')) != string::npos){
-        //cout <<"Is isothta\n";
         token = Predicate.substr(0, pos);
         PredicatePart[1] = stoi(token);
         //if pp[1] is larger than bindings [pp[0]]-> numtuples is invalid
         PredicatePart[2] = '=';
     }else if((pos = Predicate.find('>')) != string::npos){
-        //cout <<"Is column > num\n";
         token = Predicate.substr(0, pos);
         PredicatePart[1] = stoi(token);
         PredicatePart[2] = '>';
     }else if((pos = Predicate.find('<')) != string::npos){
-      //  cout <<"Is column < num\n";
         token = Predicate.substr(0, pos);
         PredicatePart[1] = stoi(token);
         PredicatePart[2] = '<';
@@ -337,10 +325,6 @@ uint64_t *ExecuteNumericalValueQuery(string Predicate, RelationMD **Bindings, in
     Predicate.erase(0, pos +1 );
     //cout << Predicate<<endl;
     PredicatePart[3] = stoi(Predicate);
-//    for (int i : PredicatePart) {
-//        cout << i<<endl;
-//    }
-    //pp[0] is binding[pp[0]], pp[1] is which column we are checking, pp[2] is the op val, pp[3] is the comparing value
     if(!isVisited(PredicatePart[0], data->visited)){
         data->visited[PredicatePart[0]] = true;
         uint64_t * res = getResults(Bindings[PredicatePart[0]]->RelationSerialData,Bindings[PredicatePart[0]]->RowsNum, PredicatePart);
@@ -371,7 +355,6 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
     rvalue[0] = ExistingIMResults[0];
     rvalue[1] = resNums;
     for (size_t i = 0; i < resNums; i++) {
-        //std::cout << temp[i] << endl;
         rvalue[i+2] = temp[i];
         //copy values to returv value array
     }
@@ -392,16 +375,10 @@ void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int colu
     //initHash(UniqueHashTable,binding->RowsNum/4);
 
     for (uint64_t i = 0; i < data->numOfPleiades; ++i) {
-        //#ifdef DEBUG
-        //cout << data->IMResColumnsForJoin[i*pleiada_size + column];
-        //#endif
-        //insertInResult(UniqueHashTable, data->IMResColumnsForJoin[i * pleiada_size + pos], binding->RowsNum / 4);
         if(!temp[data->IMResColumnsForJoin[i * pleiada_size + pos]]){
             resNum++;
         }
         temp[data->IMResColumnsForJoin[i * pleiada_size + pos]] = true;
-        //cout << "";
-        //if(temp[data->IMResColumnsForJoin[i * pleiada_size + pos]])resNum++;
     }
     relation->num_tuples = resNum;
     relation->tuples = new Tuple[resNum];
@@ -415,9 +392,6 @@ void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int colu
     }
 }
 
-void printTemp(uint64_t *pInt, uint64_t num) {
-
-}
 
 void combinationUtil(int *arr, int n, int r, int index, int *data, int i, int **setIter, int *indexOfOuter) {
     // Current cobination is ready, print it
@@ -602,9 +576,7 @@ void copyToNewIMResults(uint64_t *newResults, uint64_t iterationIndex, const uin
     }
 }
 void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t bindingR, uint64_t bindingS) {
-//    uint64_t * fresh[2];
-//    fresh[0] = start->rowIDR;
-//    fresh[1]= start->rowIDS;
+
     uint64_t hashTableSize = (numOfTuples/3)+1;
     if(data->IMResColumnsForJoin == nullptr){
         data->visitedJoint[bindingR]=true;
@@ -652,12 +624,6 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
         int newNumOfColsInTuple = numOfColsInTuple + 1;
         uint64_t *temp = new uint64_t[newNumOfColsInTuple];
         uint64_t * Results;
-//        if(data->numOfPleiades* (numOfTuples-1) * newNumOfColsInTuple <3759830160){
-//
-//            Results = new uint64_t[data->numOfPleiades* (numOfTuples-1) * newNumOfColsInTuple];
-//        }else {
-//            Results = new uint64_t[1000000];
-//        }
         uint64_t newSize = 0;
         List *tempList = start;
         while (tempList != NULL) {
@@ -672,8 +638,6 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
                                 newSize++;
                             tempListNode = tempListNode->next;
                         }
-//                            if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
-//                                newSize++;
                     } else {
                         pos = findBucket(tempList->rowIDS[i], (data->numOfPleiades/3)+1);
                         listNode *tempListNode = data->HashTable[commonColumn][pos];
@@ -682,10 +646,8 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
                                 newSize++;
                             tempListNode = tempListNode->next;
                         }
-//                        if (tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + commonColumn])
-//                            newSize++;
                     }
-                //}
+
             }
             tempList = tempList->next;
         }
@@ -701,8 +663,6 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
         }
         for(int i = 0; i < newNumOfColsInTuple; i++)
         {
-//            deleteHashTable(data->HashTable[i], (data->numOfPleiades/3)+1);
-//            delete[] data->HashTable[i];
             tempHashTable[i] = new listNode *[hashTableSize];
             initHash(tempHashTable[i], hashTableSize);
         }
@@ -776,50 +736,6 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
     }
     //last case is if they both are in imres
 
-//    if(data->visitedJoint[bindingR] && data->visitedJoint[bindingS]){
-//        uint64_t pleiades_new =0;
-//        int col1 = getFromMap(data->Map, data->numOfBindings, bindingR), col2 = getFromMap(data->Map, data->numOfBindings, bindingS);
-//        int numOfColsInTuple = getPleiada(data->visitedJoint, data->numOfBindings);
-//        List *tempList = start;
-//        while(tempList != NULL) {
-//            for (uint64_t i = 0; i < tempList->index; i++) {
-//                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
-//                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
-//                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
-//                        pleiades_new++;
-//                    }
-//                }
-//            }
-//            tempList = tempList->next;
-//        }
-//        uint64_t *temp = new uint64_t[numOfColsInTuple];
-//        uint64_t *Results = new uint64_t[pleiades_new * numOfColsInTuple];
-//        pleiades_new = 0;
-//        tempList = start;
-//        while(tempList != NULL) {
-//            for (uint64_t i = 0; i < tempList->index; i++) {
-//                for (uint64_t j = 0; j < data->numOfPleiades; j++) {
-//                    if (tempList->rowIDR[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col1] &&
-//                        tempList->rowIDS[i] == data->IMResColumnsForJoin[j * numOfColsInTuple + col2]) {
-//
-//                        putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin, numOfColsInTuple);
-////                    printTuple(temp, getPleiada(data->visitedJoint, data->numOfBindings));
-//                        putInImResults(temp, Results, pleiades_new * numOfColsInTuple,
-//                                       getPleiada(data->visitedJoint, data->numOfBindings));
-//                        pleiades_new++;
-//                    }
-//                }
-//            }
-//            tempList = tempList->next;
-//        }
-//        delete [] temp;
-//        data->numOfPleiades = pleiades_new;
-//        delete [] data->IMResColumnsForJoin;
-//        data->IMResColumnsForJoin = Results;
-//        return;
-//
-//    }
-
     if(!data->visitedJoint[bindingR] && !data->visitedJoint[bindingS]) {
         data->visitedJoint[bindingR] = true;
         data->Map[numOfColsInTuple] = bindingR;
@@ -844,7 +760,7 @@ void AddToData(IMData *data, List *start, uint64_t numOfTuples, uint64_t binding
             tempHashTable[i] = new listNode *[hashTableSize];
             initHash(tempHashTable[i], hashTableSize);
         }
-        while (tempList != NULL) {
+        while (tempList != nullptr) {
             for (uint64_t i = 0; i < tempList->index; i++) {
                 for (uint64_t j = 0; j < data->numOfPleiades; j++) {
                     putInBuffer(temp, j * numOfColsInTuple, data->IMResColumnsForJoin,
@@ -957,7 +873,6 @@ void getLists(List1 ** batchdebug, int numbatches, const string &queriesFile){
         }
         //add query to list
         AddToList(list, query);
-        //PrintList(&list);
 
     }
     workload.close();

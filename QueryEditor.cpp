@@ -10,12 +10,8 @@
 #include <set>
 #include <utility>
 #include "Perm.h"
-#define NoCrossProducts 1
-//#define DEBUG
 #include "JobScheduler.h"
 
-
-//uint64_t getResults(RelationMD *CorrespondingBinding, int PredicateParts[4]);
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
@@ -103,20 +99,20 @@ void JobExecutor(const string &queriesFile, Data *data) {
     workload.close();
 
 }
-class QueryJob : public Job {
-    int taskid;
-    Data * dataExt;
-    string Query;
-public:
-    QueryJob(int id, Data *dataExt, string Query) : Job(), taskid(id) {
-        this->taskid = id;
-        this->dataExt = dataExt;
-        this->Query = std::move(Query);
-    }
-    void run() override {
-        QueryExecutor( Query, dataExt);
-    }
-};
+//class QueryJob : public Job {
+//    int taskid;
+//    Data * dataExt;
+//    string Query;
+//public:
+//    QueryJob(int id, Data *dataExt, string Query) : Job(), taskid(id) {
+//        this->taskid = id;
+//        this->dataExt = dataExt;
+//        this->Query = std::move(Query);
+//    }
+//    void run() override {
+//        QueryExecutor( Query, dataExt);
+//    }
+//};
 //define THREADS
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
@@ -165,8 +161,6 @@ void QueryExecutor(string query, Data *dataExt) {
 
     QueryOptimizer(Predicates, numOfBindings, numOfPredicates, &QStats);
     deleteStats(statistics, numOfBindings, QStats);
-    //siudhsiuada
-
 
 #ifdef DEBUG
 //    deleteStats(statistics, numOfBindings, QStats);
@@ -180,7 +174,6 @@ void QueryExecutor(string query, Data *dataExt) {
 #endif
     for (int i = 0; i < numOfPredicates; ++i) {
         cout <<"Now processing Predicate "<< Predicates[i]<<endl;
-        //ofstream fchecker("FilterChecker.txt"), bindcheck1("Bindcheck1.txt"), bindcheck2("Bindcheck2.txt");
         short switchValue =typeOfPredicate(Predicates[i]);
         switch(switchValue){
             default:
@@ -508,14 +501,12 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
         BestTree[i].S.insert(i);
     }
     int * currSet;
-    int temp;
 
     for (int l = 1; l <= bindings; ++l) {
 
         //get all subsets of
         setIterator = new int*[combinationFormula(bindings, l)];
         printCombination(relationSet, bindings, l, setIterator);
-        //cout <<endl;
         int *newTreeArray = nullptr, *newTreeDebug;
         uint64_t newCostDebug;
         for (int i = 0; i < combinationFormula(bindings, l); ++i) {
@@ -531,7 +522,6 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
 
                 #endif
                 set <int> setter(currSet, currSet + l);
-                //newTreeArray = new int[l+1];
 
                 if(inCurrSet(j, currSet, l)){
 #ifdef DEBUG
@@ -579,7 +569,6 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
                     delete [] newTreeArray;
                     newTreeArray = nullptr;
                 }
-                //if (GetBestTree(St, BestTree) == NULL || costBestTree(St) > cost(CurrTree) replace
 
             }
         }
@@ -592,7 +581,6 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
     set <int> finalSet(relationSet, relationSet + bindings), done = {};
     int * tempPred, pos = 0;
     int * finalTree = GetBestTree(finalSet,BestTree,comboIterator);
-    //getFinalSequence(Predicates, predicates - k, )
     string * tempPredStr = new string[predicates - k];
 
 
@@ -626,7 +614,7 @@ void QueryOptimizer(string *Predicates, int bindings, int predicates, QueryStats
 
     delete [] tempPredStr;
 
-    printArray(finalTree, bindings);
+    //printArray(finalTree, bindings);
     deleteAdjacency(adjacencyMatrix, bindings);
     for (int m = 0; m < (int) (pow(2, bindings) - 1); ++m) {
         delete [] BestTree[m].tree;
@@ -698,7 +686,7 @@ void QueryOptimizer1(string *Predicates, int bindings, int predicates, QueryStat
 
     cout << "Best pred seq:";
     string tempString, *tempStringArray = new string[numOfJoins];
-    printArray(setIterator[pos], numOfJoins);
+    //printArray(setIterator[pos], numOfJoins);
 
 
 
