@@ -42,9 +42,7 @@ public:
     explicit JobScheduler(uint8_t threadNum = 1);
     ~JobScheduler();
     void schedule(Job *job);
-    bool allJobsHaveFinished();
     void waitUntilAllJobsHaveFinished();
-    uint8_t getThreadNum() { return threadNum; }
 
     static void
     initTI(thread_Info *pInfo, std::queue<Job *> *pQueue, pthread_mutex_t *queueMutex, pthread_cond_t *emptyCheckMutex,

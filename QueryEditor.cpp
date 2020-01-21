@@ -115,7 +115,7 @@ public:
 void batchExecutor(List1 * batch, Data * data){
     ListNode * curr = batch->start;
     #ifdef THREADS
-    JobScheduler scheduler(6);
+    JobScheduler scheduler(cmdLineThreadNum);
     #endif
     int i =0;
     while (curr!= nullptr){
