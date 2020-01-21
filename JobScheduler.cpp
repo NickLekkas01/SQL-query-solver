@@ -1,7 +1,6 @@
 #include <iostream>
 #include "JobScheduler.h"
 using namespace std;
-
 void JobScheduler::initTI(thread_Info *pInfo, queue<Job *> *pQueue, pthread_mutex_t *queueMutex,
                           pthread_cond_t *emptyCheckMutex, volatile uint8_t *currJobNum, volatile bool *doneCheck,
                           pthread_cond_t *finishedCheck) {
@@ -58,13 +57,6 @@ void JobScheduler::schedule(Job *job) {
     if(pthread_mutex_unlock(&queueMutex) != 0 ){ cout << "pthread_mutex_unlock failed\n"; }
 }
 
-bool JobScheduler::allJobsHaveFinished() {
-    bool result;
-    if(pthread_mutex_lock(&queueMutex) != 0 ){ cout << "pthread_mutex_lock failed\n"; }
-    result = jobQueue.empty() && currJobsRunning == 0;
-    if(pthread_mutex_unlock(&queueMutex) != 0 ){ cout << "pthread_mutex_unlock failed\n"; }
-    return result;
-}
 
 void JobScheduler::waitUntilAllJobsHaveFinished() {
     if(pthread_mutex_lock(&queueMutex) != 0 ){ cout << "pthread_mutex_lock failed\n"; }

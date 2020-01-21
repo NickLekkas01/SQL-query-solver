@@ -11,7 +11,7 @@
 #include <utility>
 #include "Perm.h"
 #include "JobScheduler.h"
-
+extern int cmdLineThreadNum;
 void printResults(uint64_t *sumOfProjections, int numOfProjections);
 
 using namespace std;
@@ -119,7 +119,6 @@ void batchExecutor(List1 * batch, Data * data){
     #endif
     int i =0;
     while (curr!= nullptr){
-        //numOfProjections=0;
         cout <<"Now Processing Query: "<<curr->query<<endl;
 
         #ifndef THREADS
