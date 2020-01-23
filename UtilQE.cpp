@@ -367,29 +367,70 @@ void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int colu
     int pleiada_size = getPleiada(data->visitedJoint, data->numOfBindings);
     int pos = getFromMap(data->Map, data->numOfBindings, RelationId);
     uint64_t resNum = 0;
-    bool temp[binding->RowsNum];
-    for (int k = 0; k < binding->RowsNum; ++k) {
-        temp[k] = false;
+//    bool temp[binding->RowsNum];
+    uint64_t size = (binding->RowsNum/4)+1;
+    bitType *temp2 = new bitType[size];
+
+    for (int k = 0; k < size; ++k) {
+//        temp[k] = false;
+        temp2[k].a = 0;
+        temp2[k].b = 0;
+        temp2[k].c = 0;
+        temp2[k].d = 0;
+
     }
     //listNode *UniqueHashTable[binding->RowsNum/4];
     //initHash(UniqueHashTable,binding->RowsNum/4);
 
     for (uint64_t i = 0; i < data->numOfPleiades; ++i) {
-        if(!temp[data->IMResColumnsForJoin[i * pleiada_size + pos]]){
-            resNum++;
+        uint64_t value = data->IMResColumnsForJoin[i * pleiada_size + pos];
+        if(value%4 == 0){
+            if(temp2[value/4].a == 0) resNum++;
+            temp2[value/4].a = 1;
+        }else if (value%4 == 1){
+            if(temp2[value/4].b == 0) resNum++;
+            temp2[value/4].b = 1;
+        }else if(value %4 == 2){
+            if(temp2[value/4].c == 0) resNum++;
+            temp2[value/4].c = 1;
+        }else if(value%4 == 3){
+            if(temp2[value/4].d == 0) resNum++;
+            temp2[value/4].d = 1;
         }
-        temp[data->IMResColumnsForJoin[i * pleiada_size + pos]] = true;
+
+//        if(!temp[data->IMResColumnsForJoin[i * pleiada_size + pos]]){
+//            resNum++;
+//        }
+//        temp[data->IMResColumnsForJoin[i * pleiada_size + pos]] = true;
     }
     relation->num_tuples = resNum;
     relation->tuples = new Tuple[resNum];
     uint64_t index =0;
     for (uint64_t j = 0; j < binding->RowsNum; ++j) {
-        if(temp[j]){
+        bool isTrue = false;
+        if(j%4 == 0){
+            if(temp2[j/4].a) isTrue = true;
+        }else if (j%4 == 1){
+            if(temp2[j/4].b) isTrue = true;
+        }else if(j %4 == 2){
+            if(temp2[j/4].c) isTrue = true;
+        }else if(j%4 == 3){
+            if(temp2[j/4].d) isTrue = true;
+        }
+        if(isTrue){
             relation->tuples[index].payload = j;
             relation->tuples[index].key = binding->RelationSerialData[column*binding->RowsNum + j];
             index++;
         }
+
+        //        if(temp[j]){
+//            relation->tuples[index].payload = j;
+//            relation->tuples[index].key = binding->RelationSerialData[column*binding->RowsNum + j];
+//            index++;
+//        }
     }
+    delete [] temp2;
+
 }
 
 
