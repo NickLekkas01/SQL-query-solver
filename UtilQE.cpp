@@ -363,6 +363,13 @@ uint64_t *craftNewResultsFromIMResults(const uint64_t *ExistingIMResults, Relati
     //return temp;
 }
 
+typedef struct bittype{
+    int a:1;
+    int b:1;
+    int c:1;
+    int d:1;
+}bitType;
+
 void getDataFromJoint(IMData *data, int RelationId, Relation *relation, int column, RelationMD *binding) {
     int pleiada_size = getPleiada(data->visitedJoint, data->numOfBindings);
     int pos = getFromMap(data->Map, data->numOfBindings, RelationId);
